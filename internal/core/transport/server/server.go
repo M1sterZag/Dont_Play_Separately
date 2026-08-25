@@ -71,3 +71,14 @@ func (s *HTTPServer) Start(ctx context.Context) error {
 
 	return nil
 }
+
+func (s *HTTPServer) RegisterAPIRoutes(routers ...*ApiVersionRouter) {
+	for _, router := range routers {
+		prefix := "/api/" + string(router.apiVersion)
+
+		s.mux.Handle(
+			prefix+"/",
+			http.StripPrefix(prefix, router.WithMiddleware()),
+		)
+	}
+}
