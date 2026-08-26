@@ -62,3 +62,9 @@ port-forward-start:
 
 port-forward-stop:
 	@docker compose down port-forwarder
+
+app-run:
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/data/logs && \
+	export POSTGRES_HOST=localhost && \
+	go mod tidy && \
+	go run ${PROJECT_ROOT}/cmd/api/main.go
