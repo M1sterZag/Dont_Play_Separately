@@ -10,6 +10,7 @@ import (
 
 	core_config "github.com/M1sterZag/Dont_Play_Separately/internal/core/config"
 	core_logger "github.com/M1sterZag/Dont_Play_Separately/internal/core/logger"
+	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/middleware"
 	core_http_server "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/server"
 	"go.uber.org/zap"
@@ -33,6 +34,13 @@ func main() {
 	defer logger.Close()
 
 	logger.Debug("application time zone", zap.Any("zone", time.Local))
+
+	logger.Debug("initializing postgres connection pool")
+	pool, err := core_pgx_pool.NewPool(ctx, core_pgx_pool.NewConfigMust())
+	if err != nil {
+		logger.Fatal("failed to init postgres connection pool", zap.Error(err))
+	}
+	defer pool.Close()
 
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
