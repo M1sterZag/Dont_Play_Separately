@@ -13,6 +13,8 @@ import (
 	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/middleware"
 	core_http_server "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/server"
+	users_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository/postgres"
+	users_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/service"
 	"go.uber.org/zap"
 )
 
@@ -41,6 +43,11 @@ func main() {
 		logger.Fatal("failed to init postgres connection pool", zap.Error(err))
 	}
 	defer pool.Close()
+
+	logger.Debug("initializing users feature")
+	usersRepo := users_postgres_repository.New(pool)
+	usersService := users_service.NewUsersService(usersRepo)
+	_ = usersService // TODO: подключить HTTP-транспорт фичи users (нужно выделение пользователя из авторизации)
 
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
