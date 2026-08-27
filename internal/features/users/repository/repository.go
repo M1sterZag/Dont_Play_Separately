@@ -8,6 +8,6 @@ import (
 )
 
 type UsersRepository interface {
-	GetUserByUUID(ctx context.Context, id uuid.UUID) (*domain.User, error)
+	GetUserByUUID(ctx context.Context, id uuid.UUID) (domain.User, error)
 	PatchUser(ctx context.Context, profilePatch domain.User) (domain.User, error)
 }

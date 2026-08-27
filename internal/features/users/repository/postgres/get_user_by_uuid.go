@@ -3,39 +3,45 @@ package users_postgres_repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/M1sterZag/Dont_Play_Separately/internal/core/domain"
 	core_errors "github.com/M1sterZag/Dont_Play_Separately/internal/core/errors"
 	core_repository "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository"
+	users_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository"
 	"github.com/google/uuid"
 )
 
-const getUserByUUIDQuery = `
+func (r *UsersRepository) GetUserByUUID(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	defer cancel()
+
+	query := `
 	SELECT id, version, email, hashed_password, nickname, bio, avatar_url, created_at
 	FROM dps.users
 	WHERE id = $1
-`
+	`
 
-func (r *UsersRepository) GetUserByUUID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
-	var user domain.User
+	row := r.pool.QueryRow(ctx, query, id)
 
-	err := r.pool.QueryRow(ctx, getUserByUUIDQuery, id).Scan(
-		&user.ID,
-		&user.Version,
-		&user.Email,
-		&user.HashedPassword,
-		&user.Nickname,
-		&user.Bio,
-		&user.AvatarUrl,
-		&user.CreatedAt,
+	var userModel users_repository.UserModel
+	err := row.Scan(
+		&userModel.ID,
+		&userModel.Version,
+		&userModel.Email,
+		&userModel.HashedPassword,
+		&userModel.Nickname,
+		&userModel.Bio,
+		&userModel.AvatarURL,
+		&userModel.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, core_repository.ErrNoRows) {
-			return nil, core_errors.ErrNotFound
+			return domain.User{}, fmt.Errorf("find user with uuid='%d': %w", id, core_errors.ErrNotFound)
 		}
-
-		return nil, err
 	}
 
-	return &user, nil
+	userDomain := users_repository.UserDomainFromModel(userModel)
+
+	return userDomain, nil
 }
