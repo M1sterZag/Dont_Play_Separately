@@ -31,3 +31,23 @@ func UserDomainFromModel(userModel UserModel) domain.User {
 		userModel.CreatedAt,
 	)
 }
+
+type UserProfileModel struct {
+	ID        uuid.UUID
+	Version   int
+	Nickname  string
+	Bio       *string
+	AvatarURL string
+	CreatedAt time.Time
+}
+
+func UserProfileFromModel(profileModel UserProfileModel) domain.UserProfile {
+	return domain.UserProfile{
+		ID:        profileModel.ID,
+		Version:   profileModel.Version,
+		Nickname:  profileModel.Nickname,
+		Bio:       profileModel.Bio,
+		AvatarURL: profileModel.AvatarURL,
+		CreatedAt: profileModel.CreatedAt,
+	}
+}

@@ -8,9 +8,9 @@ import (
 	core_http_response "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/response"
 )
 
-type GetUserResponse UserDTOResponse
+type GetProfileResponse UserProfileDTOResponse
 
-func (h *UsersHTTPHandler) GetUserByUUID(rw http.ResponseWriter, r *http.Request) {
+func (h *UsersHTTPHandler) GetProfileByUUID(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
@@ -21,12 +21,12 @@ func (h *UsersHTTPHandler) GetUserByUUID(rw http.ResponseWriter, r *http.Request
 		return
 	}
 
-	userDomain, err := h.usersService.GetUserByUUID(ctx, userUUID)
+	profile, err := h.usersService.GetProfileByUUID(ctx, userUUID)
 	if err != nil {
-		responseHandler.ErrorResponse(err, "failed to get user")
+		responseHandler.ErrorResponse(err, "failed to get user profile")
 		return
 	}
 
-	response := GetUserResponse(userDTOFromDomain(userDomain))
+	response := GetProfileResponse(userProfileDTOFromDomain(profile))
 	responseHandler.JSONResponse(response, http.StatusOK)
 }

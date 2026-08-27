@@ -14,8 +14,7 @@ type UsersHTTPHandler struct {
 }
 
 type UsersService interface {
-	GetUserByUUID(ctx context.Context, id uuid.UUID) (domain.User, error)
-	PatchUser(ctx context.Context, profilePatch domain.User) (domain.User, error)
+	GetProfileByUUID(ctx context.Context, userUUID uuid.UUID) (domain.UserProfile, error)
 }
 
 func NewUsersHTTPHandler(userService UsersService) *UsersHTTPHandler {
@@ -29,12 +28,7 @@ func (h *UsersHTTPHandler) Routes() []core_http_server.Route {
 		{
 			Method:  http.MethodGet,
 			Path:    "/users/profile",
-			Handler: h.GetUserByUUID,
-		},
-		{
-			Method:  http.MethodPatch,
-			Path:    "/users/profile",
-			Handler: h.PatchUser,
+			Handler: h.GetProfileByUUID,
 		},
 	}
 }

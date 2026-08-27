@@ -7,22 +7,22 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserDTOResponse struct {
+type UserProfileDTOResponse struct {
 	ID        uuid.UUID `json:"id"`
-	Email     string    `json:"email"`
+	Version   int       `json:"version"`
 	Nickname  string    `json:"nickname"`
 	Bio       *string   `json:"bio,omitempty"`
 	AvatarURL string    `json:"avatar_url"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func userDTOFromDomain(user domain.User) UserDTOResponse {
-	return UserDTOResponse{
-		ID:        user.ID,
-		Email:     user.Email,
-		Nickname:  user.Nickname,
-		Bio:       user.Bio,
-		AvatarURL: user.AvatarURL,
-		CreatedAt: user.CreatedAt,
+func userProfileDTOFromDomain(profile domain.UserProfile) UserProfileDTOResponse {
+	return UserProfileDTOResponse{
+		ID:        profile.ID,
+		Version:   profile.Version,
+		Nickname:  profile.Nickname,
+		Bio:       profile.Bio,
+		AvatarURL: profile.AvatarURL,
+		CreatedAt: profile.CreatedAt,
 	}
 }

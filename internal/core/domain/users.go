@@ -37,3 +37,12 @@ func NewUser(
 		CreatedAt:      createdAt,
 	}
 }
+
+type UserProfile struct {
+	ID        uuid.UUID
+	Version   int
+	Nickname  string
+	Bio       *string
+	AvatarURL string
+	CreatedAt time.Time
+}
