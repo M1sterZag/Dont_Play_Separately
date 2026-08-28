@@ -20,7 +20,7 @@ func (r *UsersRepository) GetProfileByUUID(ctx context.Context, userUUID uuid.UU
 	query := `
 	SELECT id, version, nickname, bio, avatar_url, created_at
 	FROM dps.users
-	WHERE id = $1
+	WHERE id = $1;
 	`
 
 	row := r.pool.QueryRow(ctx, query, userUUID)

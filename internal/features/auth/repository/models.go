@@ -1,0 +1,19 @@
+package auth_repository
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type UserModel struct {
+	ID      uuid.UUID
+	Version int
+
+	Email          string
+	HashedPassword string
+	Nickname       string
+	Bio            *string
+	AvatarURL      string
+	CreatedAt      time.Time
+}

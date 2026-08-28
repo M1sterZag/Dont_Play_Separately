@@ -9,7 +9,10 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-const pgxViolatesForeignKeyErrorCode = "23503"
+const (
+	pgxViolatesForeignKeyErrorCode = "23503"
+	pgxUniqueViolationErrorCode = "23505"
+)
 
 type pgxRows struct {
 	pgx.Rows
@@ -55,6 +58,10 @@ func mapErrors(err error) error {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == pgxViolatesForeignKeyErrorCode {
 		return fmt.Errorf("%v: %w", err, core_repository.ErrViolatesForeignKey)
+	}
+
+	if errors.As(err, &pgErr) && pgErr.Code == pgxUniqueViolationErrorCode {
+		return  fmt.Errorf("%v: %w", err, core_repository.ErrUniqueViolation)
 	}
 
 	return fmt.Errorf("%v: %w", err, core_repository.ErrUnknown)

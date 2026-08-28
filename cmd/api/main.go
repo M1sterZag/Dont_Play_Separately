@@ -46,7 +46,7 @@ func main() {
 	defer pool.Close()
 
 	logger.Debug("initializing users feature")
-	usersRepo := users_postgres_repository.New(pool)
+	usersRepo := users_postgres_repository.NewUsersRepository(pool)
 	usersService := users_service.NewUsersService(usersRepo)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
 

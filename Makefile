@@ -68,3 +68,6 @@ app-run:
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
 	go run ${PROJECT_ROOT}/cmd/api/main.go
+
+generate-secret:
+	openssl rand -base64 32

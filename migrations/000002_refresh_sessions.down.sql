@@ -1,0 +1,1 @@
+DROP TABLE dps.refresh_sessions;
