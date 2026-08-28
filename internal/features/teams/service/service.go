@@ -1,1 +1,1 @@
-package service
+package teams_service

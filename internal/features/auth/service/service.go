@@ -1,1 +1,1 @@
-package service
+package auth_service

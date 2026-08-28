@@ -1,1 +1,1 @@
-package service
+package platform_service

@@ -1,1 +1,1 @@
-package repository
+package game_repository

@@ -1,1 +1,1 @@
-package repository
+package auth_repository
