@@ -10,7 +10,7 @@ CREATE TABLE dps.users (
         CHECK (char_length(nickname) BETWEEN 1 AND 40),
         
     bio             TEXT,
-    avatar_url      TEXT,
+    avatar_url      TEXT NOT NULL,
     created_at      TIMESTAMPTZ  NOT NULL
 );
 

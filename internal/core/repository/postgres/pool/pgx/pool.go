@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	core_repository "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Pool struct {
-	*pgxpool.Pool
+	pool      *pgxpool.Pool
 	opTimeout time.Duration
 }
 
@@ -38,7 +39,37 @@ func NewPool(ctx context.Context, config Config) (*Pool, error) {
 	}
 
 	return &Pool{
-		Pool:      pool,
+		pool:      pool,
 		opTimeout: config.Timeout,
 	}, nil
+}
+
+func (p *Pool) Query(ctx context.Context, sql string, args ...any) (core_repository.Rows, error) {
+	rows, err := p.pool.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgxRows{rows}, nil
+}
+
+func (p *Pool) QueryRow(ctx context.Context, sql string, args ...any) core_repository.Row {
+	return pgxRow{p.pool.QueryRow(ctx, sql, args...)}
+}
+
+func (p *Pool) Exec(ctx context.Context, sql string, args ...any) (core_repository.CommandTag, error) {
+	tag, err := p.pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgxCommandTag{tag}, nil
+}
+
+func (p *Pool) Close() {
+	p.pool.Close()
+}
+
+func (p *Pool) OpTimeout() time.Duration {
+	return p.opTimeout
 }

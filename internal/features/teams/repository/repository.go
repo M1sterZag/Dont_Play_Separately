@@ -1,1 +1,1 @@
-package repository
+package teams_repository

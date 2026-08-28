@@ -13,6 +13,9 @@ import (
 	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/middleware"
 	core_http_server "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/server"
+	users_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository/postgres"
+	users_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/service"
+	users_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/transport/http"
 	"go.uber.org/zap"
 )
 
@@ -42,6 +45,11 @@ func main() {
 	}
 	defer pool.Close()
 
+	logger.Debug("initializing users feature")
+	usersRepo := users_postgres_repository.New(pool)
+	usersService := users_service.NewUsersService(usersRepo)
+	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
+
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
 	httpServer := core_http_server.NewHTTPServer(
@@ -55,6 +63,7 @@ func main() {
 	)
 
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersion1)
+	apiVersionRouter.RegisterRouters(usersTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 
