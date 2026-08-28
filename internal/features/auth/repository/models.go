@@ -17,3 +17,12 @@ type UserModel struct {
 	AvatarURL      string
 	CreatedAt      time.Time
 }
+
+type RefreshSessionModel struct {
+	ID        uuid.UUID
+	UserUUID  uuid.UUID
+	TokenHash string
+	ExpiresAt time.Time
+	RevokedAt *time.Time
+	CreatedAt time.Time
+}

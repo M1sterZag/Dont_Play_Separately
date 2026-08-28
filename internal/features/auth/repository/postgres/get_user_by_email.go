@@ -18,7 +18,7 @@ func (r *AuthRepository) GetUserByEmail(ctx context.Context, email string) (doma
 	query := `
 	SELECT id, version, email, hashed_password, nickname, bio, avatar_url, created_at
 	FROM dps.users
-	WHERE email=$1;
+	WHERE email = $1;
 	`
 
 	row := r.pool.QueryRow(ctx, query, email)
