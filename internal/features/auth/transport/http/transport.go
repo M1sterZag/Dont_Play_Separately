@@ -12,3 +12,7 @@ type AuthService interface {
 	Refresh(ctx context.Context, refreshToken string) (auth_service.Tokens, error)
 	Logout(ctx context.Context, refreshToken string) error
 }
+
+type AuthHTTPHandler struct {
+	authService AuthService
+}
