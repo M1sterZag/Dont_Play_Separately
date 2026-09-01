@@ -39,6 +39,8 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User) (doma
 	err := row.Scan(
 		&userModel.ID,
 		&userModel.Version,
+		&userModel.Email,
+		&userModel.HashedPassword,
 		&userModel.Nickname,
 		&userModel.Bio,
 		&userModel.AvatarURL,

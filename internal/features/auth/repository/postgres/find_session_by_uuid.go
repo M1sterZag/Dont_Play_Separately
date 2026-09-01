@@ -17,7 +17,7 @@ func (r *AuthRepository) FindSessionByUUID(ctx context.Context, sessionUUID uuid
 	defer cancel()
 
 	query := `
-	SELECT id, user_id, token_hash, expires_at, revoked_at, created_at
+	SELECT id, user_id, refresh_token_hash, expires_at, revoked_at, created_at
 	FROM dps.refresh_sessions
 	WHERE id = $1;
 	`

@@ -13,7 +13,7 @@ type Config struct {
 	User     string        `envconfig:"USER" required:"true"`
 	Password string        `envconfig:"PASSWORD" required:"true"`
 	Database string        `envconfig:"DB" required:"true"`
-	Timeout  time.Duration `envconfig:"TIMEOUT" required:"true"`
+	Timeout  time.Duration `envconfig:"TIMEOUT" default:"10s"`
 }
 
 func NewConfig() (Config, error) {

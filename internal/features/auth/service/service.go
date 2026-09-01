@@ -9,10 +9,10 @@ type Tokens struct {
 
 type AuthService struct {
 	authRepository auth_repository.AuthRepository
-	jwtSigner      JWTSigner
+	jwtSigner      *JWTSigner
 }
 
-func NewAuthService(authRepository auth_repository.AuthRepository, jwtSigner JWTSigner) *AuthService {
+func NewAuthService(authRepository auth_repository.AuthRepository, jwtSigner *JWTSigner) *AuthService {
 	return &AuthService{
 		authRepository: authRepository,
 		jwtSigner:      jwtSigner,
