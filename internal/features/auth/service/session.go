@@ -8,16 +8,16 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *AuthService) newSession(userUUID uuid.UUID, now time.Time) (domain.RefreshSession, string, error) {
-	sessionUUID := uuid.New()
-	refreshToken, err := s.jwtSigner.GenerateRefreshToken(sessionUUID, userUUID)
+func (s *AuthService) newSession(userID uuid.UUID, now time.Time) (domain.RefreshSession, string, error) {
+	sessionID := uuid.New()
+	refreshToken, err := s.jwtSigner.GenerateRefreshToken(sessionID, userID)
 	if err != nil {
 		return domain.RefreshSession{}, "", fmt.Errorf("generate refresh token: %w", err)
 	}
 
 	return domain.NewRefreshSession(
-		sessionUUID,
-		userUUID,
+		sessionID,
+		userID,
 		hashToken(refreshToken),
 		now.Add(s.jwtSigner.refreshTTL),
 		nil,

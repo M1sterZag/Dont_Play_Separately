@@ -14,9 +14,9 @@ import (
 type contextKey string
 
 const (
-	userUUIDContextKey contextKey = "user_uuid"
-	bearerPrefix       string     = "Bearer "
-	authorizationKey   string     = "Authorization"
+	userIDContextKey contextKey = "user_id"
+	bearerPrefix     string     = "Bearer "
+	authorizationKey string     = "Authorization"
 )
 
 func Auth(parseToken func(token string) (uuid.UUID, error)) Middleware {
@@ -33,19 +33,19 @@ func Auth(parseToken func(token string) (uuid.UUID, error)) Middleware {
 			}
 
 			token := strings.TrimPrefix(header, bearerPrefix)
-			userUUID, err := parseToken(token)
+			userID, err := parseToken(token)
 			if err != nil {
 				responseHandler.ErrorResponse(err, "invalid access token")
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), userUUIDContextKey, userUUID)
+			ctx := context.WithValue(r.Context(), userIDContextKey, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
-func UserUUIDFromContext(ctx context.Context) (uuid.UUID, bool) {
-	val, ok := ctx.Value(userUUIDContextKey).(uuid.UUID)
+func UserIDFromContext(ctx context.Context) (uuid.UUID, bool) {
+	val, ok := ctx.Value(userIDContextKey).(uuid.UUID)
 	return val, ok
 }

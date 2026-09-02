@@ -12,8 +12,8 @@ type AuthRepository interface {
 	CreateUser(ctx context.Context, user domain.User) (domain.User, error)
 
 	CreateSession(ctx context.Context, session domain.RefreshSession) error
-	FindSessionByUUID(ctx context.Context, sessionUUID uuid.UUID) (domain.RefreshSession, error)
-	RevokeSession(ctx context.Context, sessionUUID uuid.UUID) error
+	FindSessionByID(ctx context.Context, sessionID uuid.UUID) (domain.RefreshSession, error)
+	RevokeSession(ctx context.Context, sessionID uuid.UUID) error
 }
 
 type Tokens struct {

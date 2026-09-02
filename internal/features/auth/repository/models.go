@@ -20,7 +20,7 @@ type UserModel struct {
 
 type RefreshSessionModel struct {
 	ID        uuid.UUID
-	UserUUID  uuid.UUID
+	UserID    uuid.UUID
 	TokenHash string
 	ExpiresAt time.Time
 	RevokedAt *time.Time

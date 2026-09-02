@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *UsersRepository) GetProfileByUUID(ctx context.Context, userUUID uuid.UUID) (domain.UserProfile, error) {
+func (r *UsersRepository) GetProfileByID(ctx context.Context, userID uuid.UUID) (domain.UserProfile, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
@@ -23,7 +23,7 @@ func (r *UsersRepository) GetProfileByUUID(ctx context.Context, userUUID uuid.UU
 	WHERE id = $1;
 	`
 
-	row := r.pool.QueryRow(ctx, query, userUUID)
+	row := r.pool.QueryRow(ctx, query, userID)
 
 	var profileModel users_repository.UserProfileModel
 	err := row.Scan(
@@ -36,10 +36,10 @@ func (r *UsersRepository) GetProfileByUUID(ctx context.Context, userUUID uuid.UU
 	)
 	if err != nil {
 		if errors.Is(err, core_repository.ErrNoRows) {
-			return domain.UserProfile{}, fmt.Errorf("find user with uuid='%s': %w", userUUID, core_errors.ErrNotFound)
+			return domain.UserProfile{}, fmt.Errorf("find user with id='%s': %w", userID, core_errors.ErrNotFound)
 		}
 
-		return domain.UserProfile{}, fmt.Errorf("scan user with uuid='%s': %w", userUUID, err)
+		return domain.UserProfile{}, fmt.Errorf("scan user with id='%s': %w", userID, err)
 	}
 
 	return users_repository.UserProfileFromModel(profileModel), nil

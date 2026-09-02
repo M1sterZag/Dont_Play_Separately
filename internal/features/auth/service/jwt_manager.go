@@ -21,8 +21,8 @@ type AccessClaims struct {
 }
 
 type RefreshClaims struct {
-	TokenType   string    `json:"token_type"`
-	SessionUUID uuid.UUID `json:"session_uuid"`
+	TokenType string    `json:"token_type"`
+	SessionID uuid.UUID `json:"session_id"`
 	jwt.RegisteredClaims
 }
 
@@ -40,13 +40,13 @@ func NewJWTSigner(secret string, accessTTL, refreshTTL time.Duration) *JWTSigner
 	}
 }
 
-func (s *JWTSigner) GenerateAccessToken(userUUID uuid.UUID) (string, error) {
+func (s *JWTSigner) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	now := time.Now()
 
 	claims := AccessClaims{
 		TokenType: accessTokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Subject:   userUUID.String(),
+			Subject:   userID.String(),
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(s.accessTTL)),
 		},
@@ -61,14 +61,14 @@ func (s *JWTSigner) GenerateAccessToken(userUUID uuid.UUID) (string, error) {
 	return signed, nil
 }
 
-func (s *JWTSigner) GenerateRefreshToken(sessionUUID, userUUID uuid.UUID) (string, error) {
+func (s *JWTSigner) GenerateRefreshToken(sessionID, userID uuid.UUID) (string, error) {
 	now := time.Now()
 
 	claims := RefreshClaims{
-		TokenType:   refreshTokenType,
-		SessionUUID: sessionUUID,
+		TokenType:  refreshTokenType,
+		SessionID:  sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Subject:   userUUID.String(),
+			Subject:   userID.String(),
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(s.refreshTTL)),
 		},

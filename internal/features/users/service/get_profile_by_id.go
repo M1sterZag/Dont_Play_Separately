@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *UsersService) GetProfileByUUID(ctx context.Context, userUUID uuid.UUID) (domain.UserProfile, error) {
-	profile, err := s.usersRepository.GetProfileByUUID(ctx, userUUID)
+func (s *UsersService) GetProfileByID(ctx context.Context, userID uuid.UUID) (domain.UserProfile, error) {
+	profile, err := s.usersRepository.GetProfileByID(ctx, userID)
 	if err != nil {
 		return domain.UserProfile{}, fmt.Errorf("get user profile from repository: %w", err)
 	}

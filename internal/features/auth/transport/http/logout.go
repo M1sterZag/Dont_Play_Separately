@@ -1,10 +1,10 @@
 package auth_transport_http
 
 import (
-	"encoding/json"
 	"net/http"
 
 	core_logger "github.com/M1sterZag/Dont_Play_Separately/internal/core/logger"
+	core_http_request "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/request"
 	core_http_response "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/response"
 )
 
@@ -14,7 +14,7 @@ func (h *AuthHTTPHandler) Logout(rw http.ResponseWriter, r *http.Request) {
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
 	var request RefreshRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
 		responseHandler.ErrorResponse(err, "failed to decode and validate HTTP request")
 		return
 	}
