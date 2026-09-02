@@ -13,9 +13,14 @@ import (
 	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/middleware"
 	core_http_server "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/server"
+	auth_config "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth"
+	auth_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/repository/postgres"
+	auth_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/service"
+	auth_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/transport/http"
 	users_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository/postgres"
 	users_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/service"
 	users_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/transport/http"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -45,10 +50,33 @@ func main() {
 	}
 	defer pool.Close()
 
+	logger.Debug("initializing auth feature")
+	authConfig := auth_config.NewConfigMust()
+	jwtSigner := auth_service.NewJWTSigner(
+		authConfig.JWTSecret,
+		authConfig.JWTAccessTTL,
+		authConfig.JWTRefreshTTL,
+	)
+	authMW := core_http_middleware.Auth(func(token string) (uuid.UUID, error) {
+		claims, err := jwtSigner.ParseAccessToken(token)
+		if err != nil {
+			return uuid.Nil, err
+		}
+
+		return uuid.Parse(claims.Subject)
+	})
+	authRepository := auth_postgres_repository.NewAuthRepository(pool)
+	authService := auth_service.NewAuthService(authRepository, jwtSigner)
+	authTransportHTTP := auth_transport_http.NewAuthHTTPHandler(authService)
+
 	logger.Debug("initializing users feature")
-	usersRepo := users_postgres_repository.New(pool)
-	usersService := users_service.NewUsersService(usersRepo)
+	usersRepository := users_postgres_repository.NewUsersRepository(pool)
+	usersService := users_service.NewUsersService(usersRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
+	usersRoutes := usersTransportHTTP.Routes()
+	for i := range usersRoutes {
+		usersRoutes[i].Middleware = append(usersRoutes[i].Middleware, authMW)
+	}
 
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
@@ -63,7 +91,8 @@ func main() {
 	)
 
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersion1)
-	apiVersionRouter.RegisterRouters(usersTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRouters(authTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRouters(usersRoutes...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 

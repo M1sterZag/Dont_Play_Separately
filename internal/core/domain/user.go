@@ -46,3 +46,21 @@ type UserProfile struct {
 	AvatarURL string
 	CreatedAt time.Time
 }
+
+func NewUserProfile(
+	ID uuid.UUID,
+	version int,
+	nickname string,
+	bio *string,
+	avatarURL string,
+	createdAt time.Time,
+) UserProfile {
+	return UserProfile{
+		ID:        ID,
+		Version:   version,
+		Nickname:  nickname,
+		Bio:       bio,
+		AvatarURL: avatarURL,
+		CreatedAt: createdAt,
+	}
+}

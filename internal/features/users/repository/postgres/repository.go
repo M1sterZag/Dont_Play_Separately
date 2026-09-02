@@ -8,7 +8,7 @@ type UsersRepository struct {
 	pool core_repository.Pool
 }
 
-func New(pool core_repository.Pool) *UsersRepository {
+func NewUsersRepository(pool core_repository.Pool) *UsersRepository {
 	return &UsersRepository{
 		pool: pool,
 	}
