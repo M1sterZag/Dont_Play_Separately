@@ -1,14 +1,21 @@
 package users_service
 
 import (
-	users_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository"
+	"context"
+
+	"github.com/M1sterZag/Dont_Play_Separately/internal/core/domain"
+	"github.com/google/uuid"
 )
 
-type UsersService struct {
-	usersRepository users_repository.UsersRepository
+type UsersRepository interface {
+	GetProfileByUUID(ctx context.Context, userUUID uuid.UUID) (domain.UserProfile, error)
 }
 
-func NewUsersService(usersRepository users_repository.UsersRepository) *UsersService {
+type UsersService struct {
+	usersRepository UsersRepository
+}
+
+func NewUsersService(usersRepository UsersRepository) *UsersService {
 	return &UsersService{
 		usersRepository: usersRepository,
 	}
