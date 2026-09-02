@@ -22,7 +22,7 @@ func (r *AuthRepository) CreateSession(ctx context.Context, session domain.Refre
 		ctx,
 		query,
 		session.ID,
-		session.UserUUID,
+		session.UserID,
 		session.TokenHash,
 		session.ExpiresAt,
 		session.RevokedAt,

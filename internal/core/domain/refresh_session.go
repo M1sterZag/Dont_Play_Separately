@@ -7,8 +7,8 @@ import (
 )
 
 type RefreshSession struct {
-	ID uuid.UUID
-	UserUUID uuid.UUID
+	ID        uuid.UUID
+	UserID    uuid.UUID
 	TokenHash string
 	ExpiresAt time.Time
 	RevokedAt *time.Time
@@ -17,15 +17,15 @@ type RefreshSession struct {
 
 func NewRefreshSession(
 	id uuid.UUID,
-	userUUID uuid.UUID,
+	userID uuid.UUID,
 	tokenHash string,
 	expiresAt time.Time,
 	revokedAt *time.Time,
 	createdAt time.Time,
 ) RefreshSession {
 	return RefreshSession{
-		ID: id,
-		UserUUID: userUUID,
+		ID:        id,
+		UserID:    userID,
 		TokenHash: tokenHash,
 		ExpiresAt: expiresAt,
 		RevokedAt: revokedAt,

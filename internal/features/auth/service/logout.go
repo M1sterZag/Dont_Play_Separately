@@ -13,7 +13,7 @@ func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
 		return core_errors.ErrUnauthenticated
 	}
 
-	if err := s.authRepository.RevokeSession(ctx, claims.SessionUUID); err != nil {
+	if err := s.authRepository.RevokeSession(ctx, claims.SessionID); err != nil {
 		return fmt.Errorf("revoke session: %w", err)
 	}
 

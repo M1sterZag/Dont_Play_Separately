@@ -7,17 +7,17 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *AuthRepository) RevokeSession(ctx context.Context, sessionUUID uuid.UUID) error {
+func (r *AuthRepository) RevokeSession(ctx context.Context, sessionID uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
 	query := `
 	UPDATE dps.refresh_sessions
 	SET revoked_at = now()
-	WHERE id = $1
+	WHERE id = $1;
 	`
 
-	_, err := r.pool.Exec(ctx, query, sessionUUID)
+	_, err := r.pool.Exec(ctx, query, sessionID)
 	if err != nil {
 		return fmt.Errorf("revoke session: %w", err)
 	}

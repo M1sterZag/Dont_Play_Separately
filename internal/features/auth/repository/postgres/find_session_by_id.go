@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *AuthRepository) FindSessionByUUID(ctx context.Context, sessionUUID uuid.UUID) (domain.RefreshSession, error) {
+func (r *AuthRepository) FindSessionByID(ctx context.Context, sessionID uuid.UUID) (domain.RefreshSession, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
@@ -25,13 +25,13 @@ func (r *AuthRepository) FindSessionByUUID(ctx context.Context, sessionUUID uuid
 	row := r.pool.QueryRow(
 		ctx,
 		query,
-		sessionUUID,
+		sessionID,
 	)
 
 	var refreshSessionModel auth_repository.RefreshSessionModel
 	err := row.Scan(
 		&refreshSessionModel.ID,
-		&refreshSessionModel.UserUUID,
+		&refreshSessionModel.UserID,
 		&refreshSessionModel.TokenHash,
 		&refreshSessionModel.ExpiresAt,
 		&refreshSessionModel.RevokedAt,
@@ -39,7 +39,7 @@ func (r *AuthRepository) FindSessionByUUID(ctx context.Context, sessionUUID uuid
 	)
 	if err != nil {
 		if errors.Is(err, core_repository.ErrNoRows) {
-			return domain.RefreshSession{}, fmt.Errorf("session with id='%s': %w", sessionUUID, core_errors.ErrNotFound)
+			return domain.RefreshSession{}, fmt.Errorf("session with id='%s': %w", sessionID, core_errors.ErrNotFound)
 		}
 
 		return domain.RefreshSession{}, fmt.Errorf("scan error: %w", err)
@@ -47,7 +47,7 @@ func (r *AuthRepository) FindSessionByUUID(ctx context.Context, sessionUUID uuid
 
 	refreshSessionDomain := domain.NewRefreshSession(
 		refreshSessionModel.ID,
-		refreshSessionModel.UserUUID,
+		refreshSessionModel.UserID,
 		refreshSessionModel.TokenHash,
 		refreshSessionModel.ExpiresAt,
 		refreshSessionModel.RevokedAt,

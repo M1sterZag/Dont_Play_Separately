@@ -16,7 +16,7 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (Tokens,
 		return Tokens{}, core_errors.ErrUnauthenticated
 	}
 
-	session, err := s.authRepository.FindSessionByUUID(ctx, claims.SessionUUID)
+	session, err := s.authRepository.FindSessionByID(ctx, claims.SessionID)
 	if err != nil {
 		if errors.Is(err, core_errors.ErrNotFound) {
 			return Tokens{}, core_errors.ErrUnauthenticated
@@ -32,7 +32,7 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (Tokens,
 		return Tokens{}, core_errors.ErrUnauthenticated
 	}
 
-	if session.UserUUID.String() != claims.Subject {
+	if session.UserID.String() != claims.Subject {
 		return Tokens{}, core_errors.ErrUnauthenticated
 	}
 
@@ -40,7 +40,7 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (Tokens,
 		return Tokens{}, fmt.Errorf("revoke session: %w", err)
 	}
 
-	newSession, newRefreshToken, err := s.newSession(session.UserUUID, now)
+	newSession, newRefreshToken, err := s.newSession(session.UserID, now)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("new session and refresh token: %w", err)
 	}
@@ -49,7 +49,7 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (Tokens,
 		return Tokens{}, fmt.Errorf("create session: %w", err)
 	}
 
-	newAccessToken, err := s.jwtSigner.GenerateAccessToken(session.UserUUID)
+	newAccessToken, err := s.jwtSigner.GenerateAccessToken(session.UserID)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("generate new access token: %w", err)
 	}

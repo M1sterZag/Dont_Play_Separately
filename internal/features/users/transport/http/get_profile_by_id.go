@@ -10,18 +10,18 @@ import (
 
 type GetProfileResponse UserProfileDTOResponse
 
-func (h *UsersHTTPHandler) GetProfileByUUID(rw http.ResponseWriter, r *http.Request) {
+func (h *UsersHTTPHandler) GetProfileByID(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
-	userUUID, err := core_http_request.GetUUIDPathParam(r, "user_uuid")
+	userID, err := core_http_request.GetUUIDPathParam(r, "user_id")
 	if err != nil {
-		responseHandler.ErrorResponse(err, "failed to get user uuid path param")
+		responseHandler.ErrorResponse(err, "failed to get user id path param")
 		return
 	}
 
-	profile, err := h.usersService.GetProfileByUUID(ctx, userUUID)
+	profile, err := h.usersService.GetProfileByID(ctx, userID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "failed to get user profile")
 		return

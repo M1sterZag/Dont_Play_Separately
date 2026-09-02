@@ -8,7 +8,7 @@ import (
 )
 
 type UsersRepository interface {
-	GetProfileByUUID(ctx context.Context, userUUID uuid.UUID) (domain.UserProfile, error)
+	GetProfileByID(ctx context.Context, userID uuid.UUID) (domain.UserProfile, error)
 }
 
 type UsersService struct {
