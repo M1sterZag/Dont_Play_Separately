@@ -15,7 +15,7 @@ type UserModel struct {
 	HashedPassword string
 	Nickname       string
 	Bio            *string
-	AvatarURL      string
+	AvatarKey      string
 	CreatedAt      time.Time
 }
 
@@ -27,7 +27,7 @@ func UserDomainFromModel(userModel UserModel) domain.User {
 		userModel.HashedPassword,
 		userModel.Nickname,
 		userModel.Bio,
-		userModel.AvatarURL,
+		userModel.AvatarKey,
 		userModel.CreatedAt,
 	)
 }
@@ -37,7 +37,7 @@ type UserProfileModel struct {
 	Version   int
 	Nickname  string
 	Bio       *string
-	AvatarURL string
+	AvatarKey string
 	CreatedAt time.Time
 }
 
@@ -47,7 +47,7 @@ func UserProfileFromModel(profileModel UserProfileModel) domain.UserProfile {
 		Version:   profileModel.Version,
 		Nickname:  profileModel.Nickname,
 		Bio:       profileModel.Bio,
-		AvatarURL: profileModel.AvatarURL,
+		AvatarKey: profileModel.AvatarKey,
 		CreatedAt: profileModel.CreatedAt,
 	}
 }

@@ -16,7 +16,7 @@ services:
     volumes:
       - ${PROJECT_ROOT}/migrations:/migrations
 
-  port-forwarder:
+  postgres-port-forwarder:
     image: alpine/socat:1.8.0.3
     container_name: dps-postgres-port-forwarder
     command: tcp-listen:${POSTGRES_PORT},fork,reuseaddr tcp-connect:postgres-service:${POSTGRES_PORT}
@@ -26,5 +26,51 @@ services:
       - postgres-service
     restart: always
 
+  minio-service:
+    image: minio/minio:latest
+    container_name: dps-minio-service
+    environment:
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY}
+    command: server /data --address ":${MINIO_PORT}" --console-address ":9001"
+    ports:
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - dps_minio_data:/data
+    restart: always
+
+  minio-port-forwarder:
+    image: alpine/socat:1.8.0.3
+    container_name: dps-minio-port-forwarder
+    command: tcp-listen:${MINIO_PORT},fork,reuseaddr tcp-connect:minio-service:${MINIO_PORT}
+    ports:
+      - "127.0.0.1:${MINIO_PORT}:${MINIO_PORT}"
+    depends_on:
+      - minio-service
+    restart: always
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: dps-minio-init
+    depends_on:
+      - minio-service
+    environment:
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+    volumes:
+      - ${PROJECT_ROOT}/assets/avatars:/avatars:ro
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio-service:${MINIO_PORT} \"$$S3_ACCESS_KEY\" \"$$S3_SECRET_KEY\"; do
+        echo 'waiting for minio...'; sleep 2;
+      done;
+      mc mb --ignore-existing local/\"$$S3_BUCKET\" &&
+      mc anonymous set download local/\"$$S3_BUCKET\" &&
+      mc cp --recursive /avatars/ local/\"$$S3_BUCKET\" ;
+      exit 0
+      "
+
 volumes:
   dps_postgres_data:
+  dps_minio_data:

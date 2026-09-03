@@ -16,9 +16,8 @@ func (r *UsersRepository) GetProfileByID(ctx context.Context, userID uuid.UUID) 
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
-	// Учётные данные (email, hashed_password) не выбираем: они не должны покидать слой данных.
 	query := `
-	SELECT id, version, nickname, bio, avatar_url, created_at
+	SELECT id, version, nickname, bio, avatar_key, created_at
 	FROM dps.users
 	WHERE id = $1;
 	`
@@ -31,7 +30,7 @@ func (r *UsersRepository) GetProfileByID(ctx context.Context, userID uuid.UUID) 
 		&profileModel.Version,
 		&profileModel.Nickname,
 		&profileModel.Bio,
-		&profileModel.AvatarURL,
+		&profileModel.AvatarKey,
 		&profileModel.CreatedAt,
 	)
 	if err != nil {

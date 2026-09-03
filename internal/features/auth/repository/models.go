@@ -14,7 +14,7 @@ type UserModel struct {
 	HashedPassword string
 	Nickname       string
 	Bio            *string
-	AvatarURL      string
+	AvatarKey      string
 	CreatedAt      time.Time
 }
 

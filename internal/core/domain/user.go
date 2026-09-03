@@ -11,9 +11,9 @@ type User struct {
 	Version        int
 	Email          string
 	HashedPassword string
-	Nickname       string
-	Bio            *string
-	AvatarURL      string
+	Nickname  string
+	Bio       *string
+	AvatarKey string
 	CreatedAt      time.Time
 }
 
@@ -24,7 +24,7 @@ func NewUser(
 	hashedPassword string,
 	nickname string,
 	bio *string,
-	avatarURL string,
+	avatarKey string,
 	createdAt time.Time) User {
 	return User{
 		ID:             ID,
@@ -33,7 +33,7 @@ func NewUser(
 		HashedPassword: hashedPassword,
 		Nickname:       nickname,
 		Bio:            bio,
-		AvatarURL:      avatarURL,
+		AvatarKey:      avatarKey,
 		CreatedAt:      createdAt,
 	}
 }
@@ -42,8 +42,8 @@ type UserProfile struct {
 	ID        uuid.UUID
 	Version   int
 	Nickname  string
-	Bio       *string
-	AvatarURL string
+	Bio            *string
+	AvatarKey      string
 	CreatedAt time.Time
 }
 
@@ -52,7 +52,7 @@ func NewUserProfile(
 	version int,
 	nickname string,
 	bio *string,
-	avatarURL string,
+	avatarKey string,
 	createdAt time.Time,
 ) UserProfile {
 	return UserProfile{
@@ -60,7 +60,7 @@ func NewUserProfile(
 		Version:   version,
 		Nickname:  nickname,
 		Bio:       bio,
-		AvatarURL: avatarURL,
+		AvatarKey: avatarKey,
 		CreatedAt: createdAt,
 	}
 }

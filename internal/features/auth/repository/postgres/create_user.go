@@ -17,9 +17,9 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User) (doma
 
 	query := `
 	INSERT INTO dps.users
-	(id, version, email, hashed_password, nickname, bio, avatar_url, created_at)
+	(id, version, email, hashed_password, nickname, bio, avatar_key, created_at)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-	RETURNING id, version, email, hashed_password, nickname, bio, avatar_url, created_at;
+	RETURNING id, version, email, hashed_password, nickname, bio, avatar_key, created_at;
 	`
 
 	row := r.pool.QueryRow(
@@ -31,7 +31,7 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User) (doma
 		user.HashedPassword,
 		user.Nickname,
 		user.Bio,
-		user.AvatarURL,
+		user.AvatarKey,
 		user.CreatedAt,
 	)
 
@@ -43,7 +43,7 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User) (doma
 		&userModel.HashedPassword,
 		&userModel.Nickname,
 		&userModel.Bio,
-		&userModel.AvatarURL,
+		&userModel.AvatarKey,
 		&userModel.CreatedAt,
 	)
 	if err != nil {
@@ -61,7 +61,7 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User) (doma
 		userModel.HashedPassword,
 		userModel.Nickname,
 		userModel.Bio,
-		userModel.AvatarURL,
+		userModel.AvatarKey,
 		userModel.CreatedAt,
 	)
 
