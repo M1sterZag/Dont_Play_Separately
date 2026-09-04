@@ -8,6 +8,18 @@ import (
 	core_http_response "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/response"
 )
 
+// Refresh refreshes the token pair.
+// @Summary Refresh tokens
+// @Description Refreshes the access and refresh tokens using a valid refresh token.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RefreshRequest true "Refresh token"
+// @Success 200 {object} TokenResponse "OK"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 401 {object} core_http_response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router /auth/refresh [post]
 func (h *AuthHTTPHandler) Refresh(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

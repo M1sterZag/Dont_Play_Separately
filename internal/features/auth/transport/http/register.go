@@ -8,6 +8,18 @@ import (
 	core_http_response "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/response"
 )
 
+// Register creates a new user.
+// @Summary Register a new user
+// @Description Registers a new user by email, password and nickname and returns an access and refresh token pair.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "Registration payload"
+// @Success 201 {object} TokenResponse "Created"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 409 {object} core_http_response.ErrorResponse "Conflict"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router /auth/register [post]
 func (h *AuthHTTPHandler) Register(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
