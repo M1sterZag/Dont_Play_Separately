@@ -27,6 +27,6 @@ func (h *UsersHTTPHandler) GetProfileByID(rw http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	response := GetProfileResponse(userProfileDTOFromDomain(profile))
+	response := GetProfileResponse(userProfileDTOFromDomain(profile, h.storage))
 	responseHandler.JSONResponse(response, http.StatusOK)
 }

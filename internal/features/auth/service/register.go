@@ -17,14 +17,15 @@ func (s *AuthService) Register(ctx context.Context, email, password, nickname st
 		return Tokens{}, fmt.Errorf("hash password: %w", err)
 	}
 
+	userID := uuid.New()
 	user := domain.NewUser(
-		uuid.New(),
+		userID,
 		1,
 		email,
 		hashedPassword,
 		nickname,
 		nil,
-		"",
+		SelectDefaultAvatar(userID),
 		now,
 	)
 

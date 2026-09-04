@@ -11,6 +11,8 @@ import (
 	core_config "github.com/M1sterZag/Dont_Play_Separately/internal/core/config"
 	core_logger "github.com/M1sterZag/Dont_Play_Separately/internal/core/logger"
 	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
+	core_storage "github.com/M1sterZag/Dont_Play_Separately/internal/core/storage"
+	core_storage_minio "github.com/M1sterZag/Dont_Play_Separately/internal/core/storage/s3/minio"
 	core_http_middleware "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/middleware"
 	core_http_server "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/server"
 	auth_config "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth"
@@ -50,6 +52,13 @@ func main() {
 	}
 	defer pool.Close()
 
+	logger.Debug("initializing s3 storage")
+	S3StorageConfig := core_storage.NewConfigMust()
+	S3Storage, err := core_storage_minio.NewStorage(ctx, S3StorageConfig)
+	if err != nil {
+		logger.Fatal("failed to init minio storage", zap.Error(err))
+	}
+
 	logger.Debug("initializing auth feature")
 	authConfig := auth_config.NewConfigMust()
 	jwtSigner := auth_service.NewJWTSigner(
@@ -72,7 +81,7 @@ func main() {
 	logger.Debug("initializing users feature")
 	usersRepository := users_postgres_repository.NewUsersRepository(pool)
 	usersService := users_service.NewUsersService(usersRepository)
-	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
+	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService, S3Storage)
 	usersRoutes := usersTransportHTTP.Routes()
 	for i := range usersRoutes {
 		usersRoutes[i].Middleware = append(usersRoutes[i].Middleware, authMW)

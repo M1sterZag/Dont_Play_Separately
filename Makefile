@@ -4,7 +4,7 @@ export
 export PROJECT_ROOT=${shell pwd}
 
 docker-up:
-	@docker compose up -d postgres-service port-forwarder
+	@docker compose up -d postgres-service postgres-port-forwarder minio-service minio-port-forwarder
 
 docker-down:
 	@docker compose down
@@ -12,8 +12,8 @@ docker-down:
 volume-cleanup:
 	@read -p "Clean all volume data? Danger data lost. [Y/n]: " ans; \
 	if [ "$$ans" = "Y" ]; then \
-		docker compose down postgres-service port-forwarder && \
-		docker volume rm todolist-golang_todoapp_postgres_data && \
+		docker compose down postgres-service postgres-port-forwarder minio-service minio-port-forwarder && \
+		docker volume rm dps_backend_dps_postgres_data dps_backend_dps_minio_data && \
 		echo "Data files cleaned"; \
 	else \
 		echo "Cleanup canceled"; \
@@ -58,10 +58,10 @@ migrate-down:
 	@make migrate-action action=down
 
 port-forward-start:
-	@docker compose up -d port-forwarder
+	@docker compose up -d postgres-port-forwarder minio-port-forwarder
 
 port-forward-stop:
-	@docker compose down port-forwarder
+	@docker compose down postgres-port-forwarder minio-port-forwarder
 
 app-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/data/logs && \
@@ -71,3 +71,6 @@ app-run:
 
 generate-secret:
 	openssl rand -base64 32
+
+s3-init:
+	@docker compose run --rm minio-init
