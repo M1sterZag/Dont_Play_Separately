@@ -10,6 +10,19 @@ import (
 
 type GetProfileResponse UserProfileDTOResponse
 
+// GetProfileByID returns the profile of a user by ID.
+// @Summary Get user profile
+// @Description Returns the public profile of a user by their ID.
+// @Tags users
+// @Produce json
+// @Param user_id path string true "User ID" Format(uuid) example(330ca7c9-80bf-4808-a78b-d38cewer87b5)
+// @Success 200 {object} GetProfileResponse "OK"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 401 {object} core_http_response.ErrorResponse "Unauthorized"
+// @Failure 404 {object} core_http_response.ErrorResponse "Not found"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Security BearerAuth
+// @Router /users/profile/{user_id} [get]
 func (h *UsersHTTPHandler) GetProfileByID(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

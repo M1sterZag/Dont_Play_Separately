@@ -24,8 +24,19 @@ import (
 	users_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/transport/http"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+
+	_ "github.com/M1sterZag/Dont_Play_Separately/docs"
 )
 
+// @title DPS Backend API
+// @version 1.0
+// @description DPS Backend REST-API Schema
+// @host 127.0.0.1:5050
+// @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Введите access-токен в формате "Bearer <token>"
 func main() {
 	cfg := core_config.NewConfigMust()
 	time.Local = cfg.TimeZone
@@ -104,6 +115,7 @@ func main() {
 	apiVersionRouter.RegisterRouters(usersRoutes...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
+	httpServer.RegisterSwagger()
 
 	if err := httpServer.Start(ctx); err != nil {
 		logger.Error("HTTP server run error", zap.Error(err))

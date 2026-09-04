@@ -8,6 +8,18 @@ import (
 	core_http_response "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/response"
 )
 
+// Logout ends the user session.
+// @Summary Logout
+// @Description Revokes the refresh token and terminates the active session.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RefreshRequest true "Refresh token to revoke"
+// @Success 204 "No Content"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 401 {object} core_http_response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router /auth/logout [post]
 func (h *AuthHTTPHandler) Logout(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

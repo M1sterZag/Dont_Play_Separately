@@ -1,0 +1,258 @@
+basePath: /api/v1
+definitions:
+  github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  internal_features_auth_transport_http.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: P@ssw0rd123!
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  internal_features_auth_transport_http.RefreshRequest:
+    properties:
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    required:
+    - refresh_token
+    type: object
+  internal_features_auth_transport_http.RegisterRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      nickname:
+        example: gamemaster
+        maxLength: 40
+        minLength: 1
+        type: string
+      password:
+        example: P@ssw0rd123!
+        type: string
+    required:
+    - email
+    - nickname
+    - password
+    type: object
+  internal_features_auth_transport_http.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  internal_features_users_transport_http.GetProfileResponse:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      nickname:
+        type: string
+      version:
+        type: integer
+    type: object
+host: 127.0.0.1:5050
+info:
+  contact: {}
+  description: DPS Backend REST-API Schema
+  title: DPS Backend API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user by email and password and returns an access
+        and refresh token pair.
+      parameters:
+      - description: User credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_auth_transport_http.TokenResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Revokes the refresh token and terminates the active session.
+      parameters:
+      - description: Refresh token to revoke
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access and refresh tokens using a valid refresh token.
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_auth_transport_http.TokenResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Refresh tokens
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user by email, password and nickname and returns
+        an access and refresh token pair.
+      parameters:
+      - description: Registration payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_auth_transport_http.TokenResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /users/profile/{user_id}:
+    get:
+      description: Returns the public profile of a user by their ID.
+      parameters:
+      - description: User ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_users_transport_http.GetProfileResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: Введите access-токен в формате "Bearer <token>"
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

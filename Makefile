@@ -74,3 +74,11 @@ generate-secret:
 
 s3-init:
 	@docker compose run --rm minio-init
+
+swagger-gen:
+	@docker compose run --build --rm swagger \
+		init \
+		-g cmd/api/main.go \
+		-o docs \
+		--parseInternal \
+		--parseDependency
