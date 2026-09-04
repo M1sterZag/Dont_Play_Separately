@@ -25,7 +25,7 @@ func (s *AuthService) Register(ctx context.Context, email, password, nickname st
 		hashedPassword,
 		nickname,
 		nil,
-		SelectDefaultAvatar(userID),
+		domain.SelectDefaultAvatar(userID),
 		now,
 	)
 
@@ -47,7 +47,7 @@ func (s *AuthService) Register(ctx context.Context, email, password, nickname st
 	}
 
 	return Tokens{
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
