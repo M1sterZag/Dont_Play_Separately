@@ -9,6 +9,8 @@ import (
 
 type UsersRepository interface {
 	GetProfileByID(ctx context.Context, userID uuid.UUID) (domain.UserProfile, error)
+	PatchProfile(ctx context.Context, userID uuid.UUID, patch domain.UserProfile) (domain.UserProfile, error)
+	DeleteProfile(ctx context.Context, userID uuid.UUID) error
 }
 
 type UsersService struct {
