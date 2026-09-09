@@ -84,6 +84,21 @@ services:
       - ${PROJECT_ROOT}:/code
       - ${GOPATH}/pkg/mod:/go/pkg/mod
 
+  redis-service:
+    image: redis:7-alpine
+    container_name: dps-redis-service
+    restart: always
+
+  redis-port-forwarder:
+    image: alpine/socat:1.8.0.3
+    container_name: dps-redis-port-forwarder
+    command: tcp-listen:${REDIS_PORT},fork,reuseaddr tcp-connect:redis-service:${REDIS_PORT}
+    ports:
+      - "127.0.0.1:${REDIS_PORT}:${REDIS_PORT}"
+    depends_on:
+      - redis-service
+    restart: always
+
 volumes:
   dps_postgres_data:
   dps_minio_data:

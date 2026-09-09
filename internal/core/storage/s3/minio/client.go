@@ -1,4 +1,4 @@
-package core_storage_minio
+package core_minio_storage
 
 import (
 	"context"
