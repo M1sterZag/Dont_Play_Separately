@@ -8,8 +8,10 @@ import (
 	"syscall"
 	"time"
 
+	core_redis_cache "github.com/M1sterZag/Dont_Play_Separately/internal/core/cache/redis"
 	core_config "github.com/M1sterZag/Dont_Play_Separately/internal/core/config"
 	core_logger "github.com/M1sterZag/Dont_Play_Separately/internal/core/logger"
+	core_igdb_provider "github.com/M1sterZag/Dont_Play_Separately/internal/core/provider/igdb"
 	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
 	core_storage "github.com/M1sterZag/Dont_Play_Separately/internal/core/storage"
 	core_storage_minio "github.com/M1sterZag/Dont_Play_Separately/internal/core/storage/s3/minio"
@@ -19,6 +21,9 @@ import (
 	auth_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/repository/postgres"
 	auth_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/service"
 	auth_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/transport/http"
+	games_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/repository/postgres"
+	games_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/service"
+	games_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/transport/http"
 	users_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository/postgres"
 	users_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/service"
 	users_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/transport/http"
@@ -70,6 +75,18 @@ func main() {
 		logger.Fatal("failed to init minio storage", zap.Error(err))
 	}
 
+	logger.Debug("initializing cache")
+	CacheConfig := core_redis_cache.NewConfigMust()
+	RedisClient, err := core_redis_cache.NewRedisCache(ctx, CacheConfig)
+	if err != nil {
+		logger.Fatal("failed to init redis cache", zap.Error(err))
+	}
+	defer RedisClient.Close()
+
+	logger.Debug("initializing provider")
+	ProviderConfig := core_igdb_provider.NewConfigMust()
+	ProviderClient := core_igdb_provider.NewClient(ProviderConfig)
+
 	logger.Debug("initializing auth feature")
 	authConfig := auth_config.NewConfigMust()
 	jwtSigner := auth_service.NewJWTSigner(
@@ -98,6 +115,11 @@ func main() {
 		usersRoutes[i].Middleware = append(usersRoutes[i].Middleware, authMW)
 	}
 
+	logger.Debug("initializing games feature")
+	gamesRepository := games_postgres_repository.NewGamesRepository(pool)
+	gamesService := games_service.NewGameService(gamesRepository, RedisClient, ProviderClient, time.Hour)
+	gamesTransportHTTP := games_transport_http.NewGamesHTTPHandler(gamesService)
+
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
 	httpServer := core_http_server.NewHTTPServer(
@@ -113,6 +135,7 @@ func main() {
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersion1)
 	apiVersionRouter.RegisterRouters(authTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRouters(usersRoutes...)
+	apiVersionRouter.RegisterRouters(gamesTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 	httpServer.RegisterSwagger()

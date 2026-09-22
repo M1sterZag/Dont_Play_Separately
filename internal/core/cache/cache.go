@@ -2,8 +2,11 @@ package core_cache
 
 import (
 	"context"
+	"errors"
 	"time"
 )
+
+var ErrNotFound = errors.New("cache: value not found")
 
 type Cache interface {
 	Get(ctx context.Context, key string, dest any) error

@@ -79,9 +79,17 @@ func (c *Client) do(ctx context.Context, endpoint, body string) ([]byte, error) 
 				return nil, ctx.Err()
 			}
 		}
-		defer resp.Body.Close()
+		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("read igdb response: %w", err)
+		}
 
-		return io.ReadAll(resp.Body)
+		if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+			return nil, fmt.Errorf("igdb status %d: %s", resp.StatusCode, string(respBody))
+		}
+
+		return respBody, nil
 	}
 	return nil, lastErr
 }

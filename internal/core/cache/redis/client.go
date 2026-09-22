@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	core_errors "github.com/M1sterZag/Dont_Play_Separately/internal/core/errors"
+	core_cache "github.com/M1sterZag/Dont_Play_Separately/internal/core/cache"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -43,7 +43,7 @@ func (c *RedisCache) Get(ctx context.Context, key string, dest any) error {
 	raw, err := c.client.Get(ctx, key).Bytes()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return core_errors.ErrNotFound
+			return core_cache.ErrNotFound
 		}
 		return fmt.Errorf("get %s: %w", key, err)
 	}
@@ -80,4 +80,8 @@ func (c *RedisCache) Delete(ctx context.Context, keys ...string) error {
 	}
 
 	return nil
+}
+
+func (c *RedisCache) Close() error {
+	return c.client.Close()
 }

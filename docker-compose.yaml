@@ -92,7 +92,7 @@ services:
   redis-port-forwarder:
     image: alpine/socat:1.8.0.3
     container_name: dps-redis-port-forwarder
-    command: tcp-listen:${REDIS_PORT},fork,reuseaddr tcp-connect:redis-service:${REDIS_PORT}
+    command: tcp-listen:${REDIS_PORT},fork,reuseaddr tcp-connect:redis-service:6379
     ports:
       - "127.0.0.1:${REDIS_PORT}:${REDIS_PORT}"
     depends_on:

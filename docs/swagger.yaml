@@ -59,6 +59,28 @@ definitions:
       refresh_token:
         type: string
     type: object
+  internal_features_games_transport_http.GameDTOResponse:
+    properties:
+      icon_url:
+        type: string
+      id:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
+  internal_features_games_transport_http.GetGameResponse:
+    properties:
+      icon_url:
+        type: string
+      id:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
   internal_features_users_transport_http.GetProfileResponse:
     properties:
       avatar_url:
@@ -241,6 +263,74 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /games/{id}:
+    get:
+      description: Returns a catalog game by its numeric ID.
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_games_transport_http.GetGameResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Get game by ID
+      tags:
+      - games
+  /games/search:
+    get:
+      description: Searches the local catalog, falls back to IGDB if empty.
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - description: Page size
+        in: query
+        name: limit
+        type: integer
+      - description: Page offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_games_transport_http.GameDTOResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Search games
+      tags:
+      - games
   /users/profile/{user_id}:
     get:
       description: Returns the public profile of a user by their ID.
