@@ -18,6 +18,19 @@ func (g Game) ToDomain() domain.Game {
 	)
 }
 
+func (p Platform) ToDomain() domain.Platform {
+	return domain.NewPlatform(
+		p.ID,
+		p.Name,
+		p.Abbreviation,
+		nonEmptyStr(p.Slug),
+		absoluteImageURL(p.PlatformLogo),
+		nonEmptyStr(p.Checksum),
+		nonZeroInt64(p.UpdatedAt),
+		nil,
+	)
+}
+
 func nonEmptyStr(s string) *string {
 	if s == "" {
 		return nil

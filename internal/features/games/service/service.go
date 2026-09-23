@@ -15,7 +15,7 @@ type GamesRepository interface {
 	UpsertGame(ctx context.Context, game domain.Game) error
 }
 
-type GameProvider interface {
+type GamesProvider interface {
 	FetchGamesByIDs(ctx context.Context, gameIDs []int64) ([]domain.Game, error)
 	SearchGames(ctx context.Context, searchQuery string, limit, offset *int) ([]domain.Game, error)
 }
@@ -23,7 +23,7 @@ type GameProvider interface {
 type GamesService struct {
 	gamesRepository GamesRepository
 	cache           core_cache.Cache
-	provider        GameProvider
+	provider        GamesProvider
 
 	singleFlight singleflight.Group
 	cacheTTL     time.Duration
@@ -32,7 +32,7 @@ type GamesService struct {
 func NewGameService(
 	gamesRepository GamesRepository,
 	cache core_cache.Cache,
-	provider GameProvider,
+	provider GamesProvider,
 	cacheTTL time.Duration,
 ) *GamesService {
 	return &GamesService{

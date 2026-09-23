@@ -21,9 +21,14 @@ import (
 	auth_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/repository/postgres"
 	auth_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/service"
 	auth_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/transport/http"
+	games_config "github.com/M1sterZag/Dont_Play_Separately/internal/features/games"
 	games_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/repository/postgres"
 	games_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/service"
 	games_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/transport/http"
+	platforms_config "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms"
+	platforms_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/repository/postgres"
+	platforms_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/service"
+	platforms_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/transport/http"
 	users_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository/postgres"
 	users_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/service"
 	users_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/transport/http"
@@ -116,9 +121,16 @@ func main() {
 	}
 
 	logger.Debug("initializing games feature")
+	gamesConfig := games_config.NewConfigMust()
 	gamesRepository := games_postgres_repository.NewGamesRepository(pool)
-	gamesService := games_service.NewGameService(gamesRepository, RedisClient, ProviderClient, time.Hour)
+	gamesService := games_service.NewGameService(gamesRepository, RedisClient, ProviderClient, gamesConfig.CacheTTL)
 	gamesTransportHTTP := games_transport_http.NewGamesHTTPHandler(gamesService)
+
+	logger.Debug("initializing platforms feature")
+	platformsConfig := platforms_config.NewConfigMust()
+	platformsRepository := platforms_postgres_repository.NewPlatformsRepository(pool)
+	platformsService := platforms_service.NewPlatformsService(platformsRepository, RedisClient, ProviderClient, platformsConfig.CacheTTL)
+	platformsTransportHTTP := platforms_transport_http.NewPlatformsHTTPHandler(platformsService)
 
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
@@ -136,6 +148,7 @@ func main() {
 	apiVersionRouter.RegisterRouters(authTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRouters(usersRoutes...)
 	apiVersionRouter.RegisterRouters(gamesTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRouters(platformsTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 	httpServer.RegisterSwagger()
