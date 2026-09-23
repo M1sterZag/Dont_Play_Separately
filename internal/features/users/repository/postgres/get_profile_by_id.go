@@ -19,7 +19,7 @@ func (r *UsersRepository) GetProfileByID(ctx context.Context, userID uuid.UUID) 
 	query := `
 	SELECT id, version, nickname, bio, avatar_key, created_at
 	FROM dps.users
-	WHERE id = $1;
+	WHERE id=$1;
 	`
 
 	row := r.pool.QueryRow(ctx, query, userID)
@@ -38,8 +38,10 @@ func (r *UsersRepository) GetProfileByID(ctx context.Context, userID uuid.UUID) 
 			return domain.UserProfile{}, fmt.Errorf("find user with id='%s': %w", userID, core_errors.ErrNotFound)
 		}
 
-		return domain.UserProfile{}, fmt.Errorf("scan user with id='%s': %w", userID, err)
+		return domain.UserProfile{}, fmt.Errorf("scan error: %w", err)
 	}
 
-	return users_repository.UserProfileFromModel(userProfileModel), nil
+	userProfileDomain := users_repository.UserProfileFromModel(userProfileModel)
+
+	return userProfileDomain, nil
 }

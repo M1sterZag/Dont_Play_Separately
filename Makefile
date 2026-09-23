@@ -4,7 +4,7 @@ export
 export PROJECT_ROOT=${shell pwd}
 
 docker-up:
-	@docker compose up -d postgres-service postgres-port-forwarder minio-service minio-port-forwarder
+	@docker compose up -d postgres-service postgres-port-forwarder minio-service minio-port-forwarder redis-service redis-port-forwarder
 
 docker-down:
 	@docker compose down
@@ -49,7 +49,7 @@ migrate-action:
 	@docker compose run --rm migrate-service \
 		-path /migrations \
 		-database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-service:$(POSTGRES_PORT)/${POSTGRES_DB}?sslmode=disable" \
-		"$(action)"
+		$(action)
 
 migrate-up:
 	@make migrate-action action=up
@@ -58,10 +58,10 @@ migrate-down:
 	@make migrate-action action=down
 
 port-forward-start:
-	@docker compose up -d postgres-port-forwarder minio-port-forwarder
+	@docker compose up -d postgres-port-forwarder minio-port-forwarder redis-port-forwarder
 
 port-forward-stop:
-	@docker compose down postgres-port-forwarder minio-port-forwarder
+	@docker compose down postgres-port-forwarder minio-port-forwarder redis-port-forwarder
 
 app-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/data/logs && \
