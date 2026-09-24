@@ -3,24 +3,24 @@ package domain
 import "time"
 
 type Platform struct {
-	ID           int64
+	ID           int
 	Title        string
 	Abbreviation string
 	Slug         *string
 	IconURL      *string
 	Checksum     *string
-	UpdatedAt    *int64
+	UpdatedAt    *int
 	SyncedAt     *time.Time
 }
 
 func NewPlatform(
-	id int64,
+	id int,
 	title string,
 	abbreviation string,
 	slug *string,
 	iconURL *string,
 	checksum *string,
-	updatedAt *int64,
+	updatedAt *int,
 	syncedAt *time.Time,
 ) Platform {
 	return Platform{

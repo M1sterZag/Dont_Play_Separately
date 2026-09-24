@@ -3,7 +3,7 @@ package games_transport_http
 import "github.com/M1sterZag/Dont_Play_Separately/internal/core/domain"
 
 type GameDTOResponse struct {
-	ID      int64   `json:"id"`
+	ID      int     `json:"id"`
 	Title   string  `json:"title"`
 	Slug    *string `json:"slug"`
 	IconURL *string `json:"icon_url"`

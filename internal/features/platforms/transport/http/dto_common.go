@@ -3,7 +3,7 @@ package platforms_transport_http
 import "github.com/M1sterZag/Dont_Play_Separately/internal/core/domain"
 
 type PlatformDTOResponse struct {
-	ID           int64   `json:"id"`
+	ID           int     `json:"id"`
 	Title        string  `json:"title"`
 	Abbreviation string  `json:"abbreviation"`
 	Slug         *string `json:"slug"`

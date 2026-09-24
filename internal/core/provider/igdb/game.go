@@ -13,7 +13,7 @@ const gameFields string = "id,name,slug,cover.url,game_type,checksum,updated_at"
 
 const gameTypeMainGame = 0
 
-func (c *Client) FetchGamesByIDs(ctx context.Context, ids []int64) ([]domain.Game, error) {
+func (c *Client) FetchGamesByIDs(ctx context.Context, ids []int) ([]domain.Game, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}

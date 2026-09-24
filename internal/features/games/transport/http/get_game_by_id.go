@@ -26,7 +26,7 @@ func (h *GamesHTTPHandler) GetGameByID(rw http.ResponseWriter, r *http.Request) 
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
-	gameID, err := core_http_request.GetInt64PathParam(r, "id")
+	gameID, err := core_http_request.GetIntPathParam(r, "id")
 	if err != nil {
 		responseHandler.ErrorResponse(err, "failed to get game id path param")
 		return

@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *GamesService) GetGameByID(ctx context.Context, gameID int64) (domain.Game, error) {
+func (s *GamesService) GetGameByID(ctx context.Context, gameID int) (domain.Game, error) {
 	log := core_logger.FromContext(ctx)
 
 	key := fmt.Sprintf("catalog:game:%d", gameID)
@@ -36,7 +36,7 @@ func (s *GamesService) GetGameByID(ctx context.Context, gameID int64) (domain.Ga
 			return domain.Game{}, err
 		}
 
-		games, err := s.provider.FetchGamesByIDs(ctx, []int64{gameID})
+		games, err := s.provider.FetchGamesByIDs(ctx, []int{gameID})
 		if err != nil {
 			return domain.Game{}, fmt.Errorf("fetch game %d from provider: %w", gameID, err)
 		}

@@ -9,7 +9,7 @@ import (
 )
 
 type PlatformsService interface {
-	GetPlatformByID(ctx context.Context, platformID int64) (domain.Platform, error)
+	GetPlatformByID(ctx context.Context, platformID int) (domain.Platform, error)
 	SearchPlatforms(ctx context.Context, searchQuery string, limit, offset *int) ([]domain.Platform, error)
 }
 

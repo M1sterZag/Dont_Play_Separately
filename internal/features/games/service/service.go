@@ -10,13 +10,13 @@ import (
 )
 
 type GamesRepository interface {
-	GetGameByID(ctx context.Context, gameID int64) (domain.Game, error)
+	GetGameByID(ctx context.Context, gameID int) (domain.Game, error)
 	SearchGames(ctx context.Context, searchQuery string, limit, offset *int) ([]domain.Game, error)
 	UpsertGame(ctx context.Context, game domain.Game) error
 }
 
 type GamesProvider interface {
-	FetchGamesByIDs(ctx context.Context, gameIDs []int64) ([]domain.Game, error)
+	FetchGamesByIDs(ctx context.Context, gameIDs []int) ([]domain.Game, error)
 	SearchGames(ctx context.Context, searchQuery string, limit, offset *int) ([]domain.Game, error)
 }
 

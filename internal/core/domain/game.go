@@ -3,22 +3,22 @@ package domain
 import "time"
 
 type Game struct {
-	ID        int64
+	ID        int
 	Title     string
 	Slug      *string
 	IconURL   *string
 	Checksum  *string
-	UpdatedAt *int64
+	UpdatedAt *int
 	SyncedAt  *time.Time
 }
 
 func NewGame(
-	id int64,
+	id int,
 	title string,
 	slug *string,
 	iconURL *string,
 	checksum *string,
-	updatedAt *int64,
+	updatedAt *int,
 	syncedAt *time.Time,
 ) Game {
 	return Game{

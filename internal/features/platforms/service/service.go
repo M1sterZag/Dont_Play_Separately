@@ -10,13 +10,13 @@ import (
 )
 
 type PlatformsRepository interface {
-	GetPlatformByID(ctx context.Context, platformID int64) (domain.Platform, error)
+	GetPlatformByID(ctx context.Context, platformID int) (domain.Platform, error)
 	SearchPlatforms(ctx context.Context, searchQuery string, limit, offset *int) ([]domain.Platform, error)
 	UpsertPlatform(ctx context.Context, platform domain.Platform) error
 }
 
 type PlatformsProvider interface {
-	FetchPlatformsByIDs(ctx context.Context, platformIDs []int64) ([]domain.Platform, error)
+	FetchPlatformsByIDs(ctx context.Context, platformIDs []int) ([]domain.Platform, error)
 	SearchPlatforms(ctx context.Context, searchQuery string, limit, offset *int) ([]domain.Platform, error)
 }
 

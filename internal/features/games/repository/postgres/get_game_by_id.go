@@ -11,7 +11,7 @@ import (
 	games_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/games/repository"
 )
 
-func (r *GamesRepository) GetGameByID(ctx context.Context, gameID int64) (domain.Game, error) {
+func (r *GamesRepository) GetGameByID(ctx context.Context, gameID int) (domain.Game, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 

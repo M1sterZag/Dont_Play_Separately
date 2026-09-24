@@ -7,13 +7,13 @@ import (
 )
 
 type PlatformModel struct {
-	ID           int64
+	ID           int
 	Title        string
 	Abbreviation string
 	Slug         *string
 	IconURL      *string
 	Checksum     *string
-	UpdatedAt    *int64
+	UpdatedAt    *int
 	SyncedAt     *time.Time
 }
 

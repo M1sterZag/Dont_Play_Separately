@@ -13,7 +13,7 @@ func (g Game) ToDomain() domain.Game {
 		nonEmptyStr(g.Slug),
 		absoluteImageURL(g.Cover),
 		nonEmptyStr(g.Checksum),
-		nonZeroInt64(g.UpdatedAt),
+		nonZeroInt(g.UpdatedAt),
 		nil,
 	)
 }
@@ -26,7 +26,7 @@ func (p Platform) ToDomain() domain.Platform {
 		nonEmptyStr(p.Slug),
 		absoluteImageURL(p.PlatformLogo),
 		nonEmptyStr(p.Checksum),
-		nonZeroInt64(p.UpdatedAt),
+		nonZeroInt(p.UpdatedAt),
 		nil,
 	)
 }
@@ -38,7 +38,7 @@ func nonEmptyStr(s string) *string {
 	return &s
 }
 
-func nonZeroInt64(n int64) *int64 {
+func nonZeroInt(n int) *int {
 	if n == 0 {
 		return nil
 	}
