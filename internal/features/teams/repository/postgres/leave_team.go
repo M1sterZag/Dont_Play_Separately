@@ -26,6 +26,6 @@ func (r *TeamsRepository) LeaveTeam(ctx context.Context, teamID, userID uuid.UUI
 		}
 		return fmt.Errorf("scan error: %w", err)
 	}
-	
+
 	return nil
 }

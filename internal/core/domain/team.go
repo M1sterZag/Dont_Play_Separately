@@ -72,11 +72,25 @@ func (t *Team) Validate() error {
 		}
 	}
 
-	if t.IsRatingRequired && t.DesiredRating == nil {
-		return fmt.Errorf("`IsRatingRequired` is %t but `DesiredRating` is nil: %w", t.IsRatingRequired, core_errors.ErrInvalidArgument)
+	if t.IsRatingRequired && (t.DesiredRating == nil || *t.DesiredRating == "") {
+		return fmt.Errorf("`IsRatingRequired` is %t but `DesiredRating` is empty: %w", t.IsRatingRequired, core_errors.ErrInvalidArgument)
 	}
-	if !t.IsRatingRequired && t.DesiredRating != nil {
-		return fmt.Errorf("`IsRatingRequired` is %t but `DesiredRating` is not nil: %w", t.IsRatingRequired, core_errors.ErrInvalidArgument)
+	if !t.IsRatingRequired && t.DesiredRating != nil && *t.DesiredRating != "" {
+		return fmt.Errorf("`IsRatingRequired` is %t but `DesiredRating` is not empty: %w", t.IsRatingRequired, core_errors.ErrInvalidArgument)
+	}
+
+	if t.DesiredRating != nil {
+		desiredRatingLen := len([]rune(*t.DesiredRating))
+		if desiredRatingLen > 200 {
+			return fmt.Errorf("invalid `DesiredRating` len: %d: %w", desiredRatingLen, core_errors.ErrInvalidArgument)
+		}
+	}
+
+	if t.ContactLink != nil {
+		contactLinkLen := len([]rune(*t.ContactLink))
+		if contactLinkLen > 2000 {
+			return fmt.Errorf("invalid `ContactLink` len: %d: %w", contactLinkLen, core_errors.ErrInvalidArgument)
+		}
 	}
 
 	if t.SlotsTotal <= 0 {

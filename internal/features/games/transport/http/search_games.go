@@ -37,13 +37,13 @@ func (h *GamesHTTPHandler) SearchGames(rw http.ResponseWriter, r *http.Request) 
 
 	limit, err := core_http_request.GetIntQueryParam(r, "limit")
 	if err != nil {
-		responseHandler.ErrorResponse(err, "failed to get limit query param")
+		responseHandler.ErrorResponse(err, "failed to get limit (query)")
 		return
 	}
 
 	offset, err := core_http_request.GetIntQueryParam(r, "offset")
 	if err != nil {
-		responseHandler.ErrorResponse(err, "failed to get offset query param")
+		responseHandler.ErrorResponse(err, "failed to get offset (query)")
 		return
 	}
 

@@ -30,7 +30,7 @@ func (h *UsersHTTPHandler) GetProfileByID(rw http.ResponseWriter, r *http.Reques
 
 	userID, err := core_http_request.GetUUIDPathParam(r, "user_id")
 	if err != nil {
-		responseHandler.ErrorResponse(err, "failed to get user id path param")
+		responseHandler.ErrorResponse(err, "failed to get user_id (path)")
 		return
 	}
 

@@ -27,7 +27,7 @@ func (h *AuthHTTPHandler) Logout(rw http.ResponseWriter, r *http.Request) {
 
 	var request RefreshRequest
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
-		responseHandler.ErrorResponse(err, "failed to decode and validate HTTP request")
+		responseHandler.ErrorResponse(err, "failed to decode and validate request body")
 		return
 	}
 	if err := h.authService.Logout(ctx, request.RefreshToken); err != nil {

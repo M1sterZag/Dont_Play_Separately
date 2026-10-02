@@ -47,7 +47,7 @@ func (r *TeamsRepository) CreateTeam(ctx context.Context, team domain.Team) (dom
 	)
 	if err != nil {
 		if errors.Is(err, core_repository.ErrViolatesForeignKey) {
-			return domain.Team{}, fmt.Errorf("`GameID` (%d) or `PlatformID` (%d) is not exists: %w", team.GameID, team.PlatformID, core_errors.ErrInvalidArgument)
+			return domain.Team{}, fmt.Errorf("`OwnerID (%d), GameID` (%d) or `PlatformID` (%d) is not exists: %w", team.OwnerID, team.GameID, team.PlatformID, core_errors.ErrInvalidArgument)
 		}
 
 		return domain.Team{}, fmt.Errorf("scan error: %w", err)

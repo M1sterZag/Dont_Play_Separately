@@ -11,7 +11,7 @@ func (s *TeamsService) ListTeams(ctx context.Context, filter domain.TeamFilter) 
 	if err := filter.Validate(); err != nil {
 		return []domain.Team{}, fmt.Errorf("validate filter: %w", err)
 	}
-	
+
 	teams, err := s.teamsRepository.ListTeams(ctx, filter)
 	if err != nil {
 		return []domain.Team{}, fmt.Errorf("list teams: %w", err)

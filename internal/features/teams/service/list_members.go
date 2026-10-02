@@ -11,7 +11,7 @@ import (
 func (s *TeamsService) ListMembers(ctx context.Context, teamID uuid.UUID) ([]domain.TeamMember, error) {
 	teamMembers, err := s.teamsRepository.ListMembers(ctx, teamID)
 	if err != nil {
-		return []domain.TeamMember{}, fmt.Errorf("get team members: %w", err) 
+		return []domain.TeamMember{}, fmt.Errorf("get team members: %w", err)
 	}
 
 	return teamMembers, nil
