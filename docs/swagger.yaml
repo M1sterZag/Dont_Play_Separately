@@ -107,6 +107,194 @@ definitions:
       title:
         type: string
     type: object
+  internal_features_teams_transport_http.CreateTeamRequest:
+    properties:
+      contact_link:
+        maxLength: 2000
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      desired_rating:
+        maxLength: 200
+        type: string
+      game_id:
+        type: integer
+      is_rating_required:
+        type: boolean
+      platform_id:
+        type: integer
+      slots_total:
+        type: integer
+      title:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  internal_features_teams_transport_http.CreateTeamResponse:
+    properties:
+      contact_link:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      desired_rating:
+        type: string
+      game_id:
+        type: integer
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_rating_required:
+        type: boolean
+      members:
+        items:
+          $ref: '#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse'
+        type: array
+      owner_id:
+        type: string
+      platform_id:
+        type: integer
+      slots_taken:
+        type: integer
+      slots_total:
+        type: integer
+      title:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_teams_transport_http.GetTeamResponse:
+    properties:
+      contact_link:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      desired_rating:
+        type: string
+      game_id:
+        type: integer
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_rating_required:
+        type: boolean
+      members:
+        items:
+          $ref: '#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse'
+        type: array
+      owner_id:
+        type: string
+      platform_id:
+        type: integer
+      slots_taken:
+        type: integer
+      slots_total:
+        type: integer
+      title:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_teams_transport_http.PatchTeamRequest:
+    properties:
+      contact_link:
+        $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
+      description:
+        $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
+      desired_rating:
+        $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
+      is_rating_required:
+        type: boolean
+      slots_total:
+        type: integer
+      title:
+        $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
+    type: object
+  internal_features_teams_transport_http.PatchTeamResponse:
+    properties:
+      contact_link:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      desired_rating:
+        type: string
+      game_id:
+        type: integer
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_rating_required:
+        type: boolean
+      members:
+        items:
+          $ref: '#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse'
+        type: array
+      owner_id:
+        type: string
+      platform_id:
+        type: integer
+      slots_taken:
+        type: integer
+      slots_total:
+        type: integer
+      title:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_teams_transport_http.TeamDTOResponse:
+    properties:
+      contact_link:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      desired_rating:
+        type: string
+      game_id:
+        type: integer
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_rating_required:
+        type: boolean
+      members:
+        items:
+          $ref: '#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse'
+        type: array
+      owner_id:
+        type: string
+      platform_id:
+        type: integer
+      slots_taken:
+        type: integer
+      slots_total:
+        type: integer
+      title:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_teams_transport_http.TeamMemberDTOResponse:
+    properties:
+      nickname:
+        type: string
+      user_id:
+        type: string
+    type: object
   internal_features_users_transport_http.GetProfileResponse:
     properties:
       avatar_url:
@@ -425,6 +613,348 @@ paths:
       summary: Search platforms
       tags:
       - platforms
+  /teams:
+    get:
+      description: Returns active teams with optional filtering by search query, game
+        and platform.
+      parameters:
+      - description: Search by team title
+        in: query
+        name: q
+        type: string
+      - description: Filter by game ID
+        in: query
+        name: game_id
+        type: integer
+      - description: Filter by platform ID
+        in: query
+        name: platform_id
+        type: integer
+      - description: Page size (default 20)
+        in: query
+        name: limit
+        type: integer
+      - description: Page offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_teams_transport_http.TeamDTOResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: List teams
+      tags:
+      - teams
+    post:
+      consumes:
+      - application/json
+      description: Creates a team for the authenticated user as its owner. The owner
+        automatically becomes a member.
+      parameters:
+      - description: Create team payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_teams_transport_http.CreateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_teams_transport_http.CreateTeamResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create team
+      tags:
+      - teams
+  /teams/{team_id}:
+    delete:
+      description: Deletes a team. Only the owner can delete.
+      parameters:
+      - description: Team ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: team_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete team
+      tags:
+      - teams
+    get:
+      description: Returns a team by ID together with its members.
+      parameters:
+      - description: Team ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: team_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_teams_transport_http.GetTeamResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Get team
+      tags:
+      - teams
+    put:
+      consumes:
+      - application/json
+      description: 'Partially updates a team. Only the owner can update; pass "description":
+        null to clear it.'
+      parameters:
+      - description: Team ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: team_id
+        required: true
+        type: string
+      - description: Team patch payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_teams_transport_http.PatchTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_teams_transport_http.PatchTeamResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict (optimistic lock)
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update team
+      tags:
+      - teams
+  /teams/{team_id}/join:
+    post:
+      description: Adds the authenticated user to the team if it is active and has
+        free slots.
+      parameters:
+      - description: Team ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: team_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict (already a member / full / inactive)
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Join team
+      tags:
+      - teams
+  /teams/{team_id}/leave:
+    post:
+      description: Removes the authenticated user from the team. The owner cannot
+        leave the team.
+      parameters:
+      - description: Team ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: team_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict (not a member / owner)
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Leave team
+      tags:
+      - teams
+  /teams/{team_id}/members/{user_id}:
+    delete:
+      description: Removes a member from the team. Only the owner can remove; the
+        owner cannot be removed.
+      parameters:
+      - description: Team ID
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: team_id
+        required: true
+        type: string
+      - description: User ID to remove
+        example: 330ca7c9-80bf-4808-a78b-d38cewer87b5
+        format: uuid
+        in: path
+        name: user_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict (cannot remove the owner)
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove team member
+      tags:
+      - teams
   /users/profile/{user_id}:
     get:
       description: Returns the public profile of a user by their ID.

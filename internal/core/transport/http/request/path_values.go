@@ -23,15 +23,15 @@ func GetUUIDPathParam(r *http.Request, key string) (uuid.UUID, error) {
 	return val, nil
 }
 
-func GetInt64PathParam(r *http.Request, key string) (int64, error) {
+func GetIntPathParam(r *http.Request, key string) (int, error) {
 	pathValue := r.PathValue(key)
 	if pathValue == "" {
 		return 0, fmt.Errorf("no key='%s' in path values: %w", key, core_errors.ErrInvalidArgument)
 	}
 
-	val, err := strconv.ParseInt(pathValue, 10, 64)
+	val, err := strconv.Atoi(pathValue)
 	if err != nil {
-		return 0, fmt.Errorf("path value='%s' by key='%s' not a valid int64: %w", pathValue, key, core_errors.ErrInvalidArgument)
+		return 0, fmt.Errorf("path value='%s' by key='%s' not a valid int: %w", pathValue, key, core_errors.ErrInvalidArgument)
 	}
 	return val, nil
 }

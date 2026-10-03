@@ -27,7 +27,7 @@ func (h *AuthHTTPHandler) Login(rw http.ResponseWriter, r *http.Request) {
 
 	var request LoginRequest
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
-		responseHandler.ErrorResponse(err, "failed to decode and validate HTTP request")
+		responseHandler.ErrorResponse(err, "failed to decode and validate request body")
 		return
 	}
 

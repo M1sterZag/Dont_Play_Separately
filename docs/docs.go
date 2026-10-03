@@ -426,6 +426,518 @@ const docTemplate = `{
                 }
             }
         },
+        "/teams": {
+            "get": {
+                "description": "Returns active teams with optional filtering by search query, game and platform.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "List teams",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search by team title",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by game ID",
+                        "name": "game_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by platform ID",
+                        "name": "platform_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page offset (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/internal_features_teams_transport_http.TeamDTOResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a team for the authenticated user as its owner. The owner automatically becomes a member.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Create team",
+                "parameters": [
+                    {
+                        "description": "Create team payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_teams_transport_http.CreateTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_teams_transport_http.CreateTeamResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/teams/{team_id}": {
+            "get": {
+                "description": "Returns a team by ID together with its members.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Get team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_teams_transport_http.GetTeamResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partially updates a team. Only the owner can update; pass \"description\": null to clear it.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Update team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Team patch payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_teams_transport_http.PatchTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_teams_transport_http.PatchTeamResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (optimistic lock)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a team. Only the owner can delete.",
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Delete team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/teams/{team_id}/join": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Adds the authenticated user to the team if it is active and has free slots.",
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Join team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (already a member / full / inactive)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/teams/{team_id}/leave": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Removes the authenticated user from the team. The owner cannot leave the team.",
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Leave team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (not a member / owner)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/teams/{team_id}/members/{user_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Removes a member from the team. Only the owner can remove; the owner cannot be removed.",
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Remove team member",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "330ca7c9-80bf-4808-a78b-d38cewer87b5",
+                        "description": "User ID to remove",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (cannot remove the owner)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/profile/me": {
             "delete": {
                 "security": [
@@ -751,6 +1263,289 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_features_teams_transport_http.CreateTeamRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "contact_link": {
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "desired_rating": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "game_id": {
+                    "type": "integer"
+                },
+                "is_rating_required": {
+                    "type": "boolean"
+                },
+                "platform_id": {
+                    "type": "integer"
+                },
+                "slots_total": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                }
+            }
+        },
+        "internal_features_teams_transport_http.CreateTeamResponse": {
+            "type": "object",
+            "properties": {
+                "contact_link": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "desired_rating": {
+                    "type": "string"
+                },
+                "game_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_rating_required": {
+                    "type": "boolean"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse"
+                    }
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "platform_id": {
+                    "type": "integer"
+                },
+                "slots_taken": {
+                    "type": "integer"
+                },
+                "slots_total": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_features_teams_transport_http.GetTeamResponse": {
+            "type": "object",
+            "properties": {
+                "contact_link": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "desired_rating": {
+                    "type": "string"
+                },
+                "game_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_rating_required": {
+                    "type": "boolean"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse"
+                    }
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "platform_id": {
+                    "type": "integer"
+                },
+                "slots_taken": {
+                    "type": "integer"
+                },
+                "slots_total": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_features_teams_transport_http.PatchTeamRequest": {
+            "type": "object",
+            "properties": {
+                "contact_link": {
+                    "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string"
+                },
+                "description": {
+                    "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string"
+                },
+                "desired_rating": {
+                    "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string"
+                },
+                "is_rating_required": {
+                    "type": "boolean"
+                },
+                "slots_total": {
+                    "type": "integer"
+                },
+                "title": {
+                    "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string"
+                }
+            }
+        },
+        "internal_features_teams_transport_http.PatchTeamResponse": {
+            "type": "object",
+            "properties": {
+                "contact_link": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "desired_rating": {
+                    "type": "string"
+                },
+                "game_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_rating_required": {
+                    "type": "boolean"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse"
+                    }
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "platform_id": {
+                    "type": "integer"
+                },
+                "slots_taken": {
+                    "type": "integer"
+                },
+                "slots_total": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_features_teams_transport_http.TeamDTOResponse": {
+            "type": "object",
+            "properties": {
+                "contact_link": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "desired_rating": {
+                    "type": "string"
+                },
+                "game_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_rating_required": {
+                    "type": "boolean"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_features_teams_transport_http.TeamMemberDTOResponse"
+                    }
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "platform_id": {
+                    "type": "integer"
+                },
+                "slots_taken": {
+                    "type": "integer"
+                },
+                "slots_total": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_features_teams_transport_http.TeamMemberDTOResponse": {
+            "type": "object",
+            "properties": {
+                "nickname": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

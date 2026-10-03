@@ -27,7 +27,7 @@ func (h *UsersHTTPHandler) DeleteProfile(rw http.ResponseWriter, r *http.Request
 
 	userID, ok := core_http_middleware.UserIDFromContext(ctx)
 	if !ok {
-		responseHandler.ErrorResponse(core_errors.ErrUnauthenticated, "failed to get user id from context")
+		responseHandler.ErrorResponse(core_errors.ErrUnauthenticated, "failed to get user_id (context)")
 		return
 	}
 	if err := h.usersService.DeleteProfile(ctx, userID); err != nil {

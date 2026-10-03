@@ -11,7 +11,7 @@ import (
 
 const platformFields string = "id,name,slug,abbreviation,platform_logo.url,checksum,updated_at"
 
-func (c *Client) FetchPlatformsByIDs(ctx context.Context, ids []int64) ([]domain.Platform, error) {
+func (c *Client) FetchPlatformsByIDs(ctx context.Context, ids []int) ([]domain.Platform, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}

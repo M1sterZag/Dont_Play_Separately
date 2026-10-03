@@ -26,9 +26,9 @@ func (h *PlatformsHTTPHandler) GetPlatformByID(rw http.ResponseWriter, r *http.R
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
-	platformID, err := core_http_request.GetInt64PathParam(r, "id")
+	platformID, err := core_http_request.GetIntPathParam(r, "id")
 	if err != nil {
-		responseHandler.ErrorResponse(err, "failed to get platform id path param")
+		responseHandler.ErrorResponse(err, "failed to get platform_id (path)")
 		return
 	}
 

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -29,6 +30,9 @@ import (
 	platforms_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/repository/postgres"
 	platforms_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/service"
 	platforms_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/transport/http"
+	teams_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/teams/repository/postgres"
+	teams_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/teams/service"
+	teams_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/teams/transport/http"
 	users_postgres_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/repository/postgres"
 	users_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/service"
 	users_transport_http "github.com/M1sterZag/Dont_Play_Separately/internal/features/users/transport/http"
@@ -132,6 +136,18 @@ func main() {
 	platformsService := platforms_service.NewPlatformsService(platformsRepository, RedisClient, ProviderClient, platformsConfig.CacheTTL)
 	platformsTransportHTTP := platforms_transport_http.NewPlatformsHTTPHandler(platformsService)
 
+	logger.Debug("initializing teams feature")
+	teamsRepository := teams_postgres_repository.NewTeamsRepository(pool)
+	teamsService := teams_service.NewTeamsService(teamsRepository)
+	teamsTransportHTTP := teams_transport_http.NewTeamsHTTPHandler(teamsService)
+	teamsRoutes := teamsTransportHTTP.Routes()
+	for i := range teamsRoutes {
+		if teamsRoutes[i].Method == http.MethodGet {
+			continue
+		}
+		teamsRoutes[i].Middleware = append(teamsRoutes[i].Middleware, authMW)
+	}
+
 	logger.Debug("initializing HTTP server")
 	httpConfig := core_http_server.NewConfigMust()
 	httpServer := core_http_server.NewHTTPServer(
@@ -149,6 +165,7 @@ func main() {
 	apiVersionRouter.RegisterRouters(usersRoutes...)
 	apiVersionRouter.RegisterRouters(gamesTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRouters(platformsTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRouters(teamsRoutes...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 	httpServer.RegisterSwagger()

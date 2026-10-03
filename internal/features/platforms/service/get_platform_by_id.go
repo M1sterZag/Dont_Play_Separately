@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *PlatformsService) GetPlatformByID(ctx context.Context, platformID int64) (domain.Platform, error) {
+func (s *PlatformsService) GetPlatformByID(ctx context.Context, platformID int) (domain.Platform, error) {
 	log := core_logger.FromContext(ctx)
 
 	key := fmt.Sprintf("catalog:platform:%d", platformID)
@@ -36,7 +36,7 @@ func (s *PlatformsService) GetPlatformByID(ctx context.Context, platformID int64
 			return domain.Platform{}, err
 		}
 
-		platforms, err := s.provider.FetchPlatformsByIDs(ctx, []int64{platformID})
+		platforms, err := s.provider.FetchPlatformsByIDs(ctx, []int{platformID})
 		if err != nil {
 			return domain.Platform{}, fmt.Errorf("fetch platform %d from provider: %w", platformID, err)
 		}

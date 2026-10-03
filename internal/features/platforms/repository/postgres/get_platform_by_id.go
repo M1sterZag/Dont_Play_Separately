@@ -11,7 +11,7 @@ import (
 	platforms_repository "github.com/M1sterZag/Dont_Play_Separately/internal/features/platforms/repository"
 )
 
-func (r *PlatformsRepository) GetPlatformByID(ctx context.Context, platformID int64) (domain.Platform, error) {
+func (r *PlatformsRepository) GetPlatformByID(ctx context.Context, platformID int) (domain.Platform, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 

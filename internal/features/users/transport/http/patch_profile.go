@@ -34,13 +34,13 @@ func (h *UsersHTTPHandler) PatchProfile(rw http.ResponseWriter, r *http.Request)
 
 	userID, ok := core_http_middleware.UserIDFromContext(ctx)
 	if !ok {
-		responseHandler.ErrorResponse(core_errors.ErrUnauthenticated, "failed to get user id from context")
+		responseHandler.ErrorResponse(core_errors.ErrUnauthenticated, "failed to get user_id (context)")
 		return
 	}
 
 	var request PatchProfileRequest
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
-		responseHandler.ErrorResponse(err, "failed to decode and validate HTTP request")
+		responseHandler.ErrorResponse(err, "failed to decode and validate request body")
 		return
 	}
 
