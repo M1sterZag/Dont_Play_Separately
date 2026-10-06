@@ -51,3 +51,36 @@ func UserProfileFromModel(profileModel UserProfileModel) domain.UserProfile {
 		CreatedAt: profileModel.CreatedAt,
 	}
 }
+
+type PlatformModel struct {
+	ID           int
+	Title        string
+	Abbreviation string
+	Slug         *string
+	IconURL      *string
+	Checksum     *string
+	UpdatedAt    *int
+	SyncedAt     *time.Time
+}
+
+func PlatformDomainFromModel(platformModel PlatformModel) domain.Platform {
+	return domain.NewPlatform(
+		platformModel.ID,
+		platformModel.Title,
+		platformModel.Abbreviation,
+		platformModel.Slug,
+		platformModel.IconURL,
+		platformModel.Checksum,
+		platformModel.UpdatedAt,
+		platformModel.SyncedAt,
+	)
+}
+
+func PlatformDomainsFromModels(platformModels []PlatformModel) []domain.Platform {
+	platformDomains := make([]domain.Platform, len(platformModels))
+	for i, platformModel := range platformModels {
+		platformDomains[i] = PlatformDomainFromModel(platformModel)
+	}
+
+	return platformDomains
+}

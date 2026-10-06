@@ -12,9 +12,22 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *UsersRepository) PatchProfile(ctx context.Context, userID uuid.UUID, profile domain.UserProfile) (domain.UserProfile, error) {
+func (r *UsersRepository) PatchProfile(
+	ctx context.Context,
+	userID uuid.UUID,
+	profile domain.UserProfile,
+	favoritePlatformIDs *[]int,
+) (domain.UserProfile, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
+
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return domain.UserProfile{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
 
 	query := `
 	UPDATE dps.users
@@ -23,7 +36,7 @@ func (r *UsersRepository) PatchProfile(ctx context.Context, userID uuid.UUID, pr
 	RETURNING id, version, nickname, bio, avatar_key, created_at;
 	`
 
-	row := r.pool.QueryRow(
+	row := tx.QueryRow(
 		ctx,
 		query,
 		userID,
@@ -46,6 +59,39 @@ func (r *UsersRepository) PatchProfile(ctx context.Context, userID uuid.UUID, pr
 			return domain.UserProfile{}, fmt.Errorf("user with id='%s' concurently accessed: %w", userID, core_errors.ErrConflict)
 		}
 		return domain.UserProfile{}, fmt.Errorf("scan error: %w", err)
+	}
+
+	if favoritePlatformIDs != nil {
+		if _, err := tx.Exec(
+			ctx,
+			`DELETE FROM dps.user_platforms WHERE user_id=$1;`,
+			userID,
+		); err != nil {
+			return domain.UserProfile{}, fmt.Errorf("delete favorite platforms: %w", err)
+		}
+
+		for _, platformID := range *favoritePlatformIDs {
+			if _, err := tx.Exec(
+				ctx,
+				`INSERT INTO dps.user_platforms (user_id, platform_id) VALUES ($1, $2);`,
+				userID,
+				platformID,
+			); err != nil {
+				if errors.Is(err, core_repository.ErrViolatesForeignKey) {
+					return domain.UserProfile{}, fmt.Errorf(
+						"favorite platform with id='%d' not found: %w",
+						platformID,
+						core_errors.ErrInvalidArgument,
+					)
+				}
+
+				return domain.UserProfile{}, fmt.Errorf("insert favorite platform: %w", err)
+			}
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return domain.UserProfile{}, fmt.Errorf("commit transaction: %w", err)
 	}
 
 	profileDomain := users_repository.UserProfileFromModel(userProfileModel)

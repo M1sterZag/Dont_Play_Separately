@@ -9,7 +9,7 @@ import (
 
 type AuthRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (domain.User, error)
-	CreateUser(ctx context.Context, user domain.User) (domain.User, error)
+	CreateUser(ctx context.Context, user domain.User, favoritePlatformIDs []int) (domain.User, error)
 
 	CreateSession(ctx context.Context, session domain.RefreshSession) error
 	FindSessionByID(ctx context.Context, sessionID uuid.UUID) (domain.RefreshSession, error)

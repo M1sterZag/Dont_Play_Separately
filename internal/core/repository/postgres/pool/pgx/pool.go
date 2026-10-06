@@ -60,10 +60,19 @@ func (p *Pool) QueryRow(ctx context.Context, sql string, args ...any) core_repos
 func (p *Pool) Exec(ctx context.Context, sql string, args ...any) (core_repository.CommandTag, error) {
 	tag, err := p.pool.Exec(ctx, sql, args...)
 	if err != nil {
-		return nil, err
+		return nil, mapErrors(err)
 	}
 
 	return pgxCommandTag{tag}, nil
+}
+
+func (p *Pool) Begin(ctx context.Context) (core_repository.Tx, error) {
+	tx, err := p.pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgxTx{tx}, nil
 }
 
 func (p *Pool) Close() {

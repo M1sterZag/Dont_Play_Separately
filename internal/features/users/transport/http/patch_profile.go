@@ -14,7 +14,7 @@ type PatchProfileResponse UserProfileDTOResponse
 
 // PatchProfile updates the authenticated user's profile.
 // @Summary Update user profile
-// @Description Partially updates the authenticated user's public profile (nickname, bio, avatar preset). A field is updated only if it is present in the body; pass "bio": null to clear it. Only the owner can modify their own profile.
+// @Description Partially updates the authenticated user's public profile (nickname, bio, avatar preset, favorite platforms). A field is updated only if it is present in the body; pass "bio": null to clear it, pass "favorite_platform_ids": null to clear the list of favorite platforms (max 3 items). Only the owner can modify their own profile.
 // @Tags users
 // @Accept json
 // @Produce json

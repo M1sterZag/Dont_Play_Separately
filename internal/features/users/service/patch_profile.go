@@ -18,10 +18,26 @@ func (s *UsersService) PatchProfile(ctx context.Context, userID uuid.UUID, patch
 		return domain.UserProfile{}, fmt.Errorf("apply patch: %w", err)
 	}
 
-	patchedProfile, err := s.usersRepository.PatchProfile(ctx, userID, profile)
+	var favoritePlatformIDs *[]int
+	if patch.FavoritePlatformIDs.Set {
+		if patch.FavoritePlatformIDs.Value == nil {
+			emptyPlatformIDs := []int{}
+			favoritePlatformIDs = &emptyPlatformIDs
+		} else {
+			favoritePlatformIDs = patch.FavoritePlatformIDs.Value
+		}
+	}
+
+	patchedProfile, err := s.usersRepository.PatchProfile(ctx, userID, profile, favoritePlatformIDs)
 	if err != nil {
 		return domain.UserProfile{}, fmt.Errorf("patch profile: %w", err)
 	}
+
+	favoritePlatforms, err := s.usersRepository.GetFavoritePlatforms(ctx, userID)
+	if err != nil {
+		return domain.UserProfile{}, fmt.Errorf("get favorite platforms: %w", err)
+	}
+	patchedProfile.FavoritePlatforms = favoritePlatforms
 
 	return patchedProfile, nil
 }
