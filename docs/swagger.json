@@ -164,7 +164,7 @@
         },
         "/auth/register": {
             "post": {
-                "description": "Registers a new user by email, password and nickname and returns an access and refresh token pair. Optionally accepts a list of up to 3 favorite platform IDs (favorite_platform_ids) that will be saved for the new user.",
+                "description": "Registers a new user by email, password and nickname and sends a verification code to the email. The account stays unverified until the code is confirmed via /auth/verify-email. Optionally accepts a list of up to 3 favorite platform IDs (favorite_platform_ids) that will be saved for the new user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -188,9 +188,9 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Created, verification code sent",
                         "schema": {
-                            "$ref": "#/definitions/internal_features_auth_transport_http.TokenResponse"
+                            "$ref": "#/definitions/internal_features_auth_transport_http.MessageResponse"
                         }
                     },
                     "400": {
@@ -201,6 +201,122 @@
                     },
                     "409": {
                         "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/resend-verification-code": {
+            "post": {
+                "description": "Generates a new verification code and sends it to the user email. Can be requested no more often than once per configured interval.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Resend verification code",
+                "parameters": [
+                    {
+                        "description": "Resend payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_auth_transport_http.ResendVerificationCodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted, new code sent",
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_auth_transport_http.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Already verified or too frequent requests",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/verify-email": {
+            "post": {
+                "description": "Confirms the email using the verification code sent during registration. On success the account is marked as verified and an access and refresh token pair is returned.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Verify user email with a code",
+                "parameters": [
+                    {
+                        "description": "Verification payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_auth_transport_http.VerifyEmailRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Verified, tokens returned",
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_auth_transport_http.TokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Already verified",
                         "schema": {
                             "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse"
                         }
@@ -1154,6 +1270,14 @@
                 }
             }
         },
+        "internal_features_auth_transport_http.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_features_auth_transport_http.RefreshRequest": {
             "type": "object",
             "required": [
@@ -1197,6 +1321,18 @@
                 }
             }
         },
+        "internal_features_auth_transport_http.ResendVerificationCodeRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                }
+            }
+        },
         "internal_features_auth_transport_http.TokenResponse": {
             "type": "object",
             "properties": {
@@ -1205,6 +1341,23 @@
                 },
                 "refresh_token": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_features_auth_transport_http.VerifyEmailRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "email"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
                 }
             }
         },

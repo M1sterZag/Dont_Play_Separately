@@ -9,16 +9,16 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *AuthService) Register(ctx context.Context, email, password, nickname string, favoritePlatformIDs []int) (Tokens, error) {
+func (s *AuthService) Register(ctx context.Context, email, password, nickname string, favoritePlatformIDs []int) error {
 	now := time.Now()
 
 	if err := domain.ValidateFavoritePlatformIDs(favoritePlatformIDs); err != nil {
-		return Tokens{}, fmt.Errorf("validate favorite platform ids: %w", err)
+		return fmt.Errorf("validate favorite platform ids: %w", err)
 	}
 
 	hashedPassword, err := HashPassword(password)
 	if err != nil {
-		return Tokens{}, fmt.Errorf("hash password: %w", err)
+		return fmt.Errorf("hash password: %w", err)
 	}
 
 	userID := uuid.New()
@@ -31,27 +31,25 @@ func (s *AuthService) Register(ctx context.Context, email, password, nickname st
 		nil,
 		domain.SelectDefaultAvatar(userID),
 		now,
+		false,
 	)
 
 	if _, err := s.authRepository.CreateUser(ctx, user, favoritePlatformIDs); err != nil {
-		return Tokens{}, fmt.Errorf("create user: %w", err)
+		return fmt.Errorf("create user: %w", err)
 	}
 
-	session, refreshToken, err := s.newSession(user.ID, now)
+	code, err := generateVerificationCode(s.config.VerificationCodeLength)
 	if err != nil {
-		return Tokens{}, fmt.Errorf("new session: %w", err)
-	}
-	if err := s.authRepository.CreateSession(ctx, session); err != nil {
-		return Tokens{}, fmt.Errorf("save session: %w", err)
+		return fmt.Errorf("generate verification code: %w", err)
 	}
 
-	accessToken, err := s.jwtSigner.GenerateAccessToken(user.ID)
-	if err != nil {
-		return Tokens{}, fmt.Errorf("generate access token: %w", err)
+	if err := s.saveVerificationCode(ctx, email, code, now); err != nil {
+		return fmt.Errorf("save verification code: %w", err)
 	}
 
-	return Tokens{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}, nil
+	if err := s.sendVerificationEmail(ctx, email, code); err != nil {
+		return fmt.Errorf("send verification email: %w", err)
+	}
+
+	return nil
 }

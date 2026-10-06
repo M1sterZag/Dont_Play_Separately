@@ -9,7 +9,10 @@ import (
 )
 
 type AuthService interface {
-	Register(ctx context.Context, email, password, nickname string, favoritePlatformIDs []int) (auth_service.Tokens, error)
+	Register(ctx context.Context, email, password, nickname string, favoritePlatformIDs []int) error
+	VerifyEmail(ctx context.Context, email, code string) (auth_service.Tokens, error)
+	ResendVerificationCode(ctx context.Context, email string) error
+
 	Login(ctx context.Context, email, password string) (auth_service.Tokens, error)
 	Refresh(ctx context.Context, refreshToken string) (auth_service.Tokens, error)
 	Logout(ctx context.Context, refreshToken string) error
@@ -46,6 +49,16 @@ func (h *AuthHTTPHandler) Routes() []core_http_server.Route {
 			Method:  http.MethodPost,
 			Path:    "/auth/refresh",
 			Handler: h.Refresh,
+		},
+				{
+			Method:  http.MethodPost,
+			Path:    "/auth/verify-email",
+			Handler: h.VerifyEmail,
+		},
+		{
+			Method:  http.MethodPost,
+			Path:    "/auth/resend-verification-code",
+			Handler: h.ResendVerificationCode,
 		},
 	}
 }

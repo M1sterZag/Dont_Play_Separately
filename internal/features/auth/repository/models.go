@@ -10,12 +10,13 @@ type UserModel struct {
 	ID      uuid.UUID
 	Version int
 
-	Email          string
-	HashedPassword string
-	Nickname       string
-	Bio            *string
-	AvatarKey      string
-	CreatedAt      time.Time
+	Email           string
+	HashedPassword  string
+	Nickname        string
+	Bio             *string
+	AvatarKey       string
+	CreatedAt       time.Time
+	IsEmailVerified bool
 }
 
 type RefreshSessionModel struct {

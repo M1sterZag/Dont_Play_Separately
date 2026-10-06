@@ -22,6 +22,10 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (Tokens
 		return Tokens{}, core_errors.ErrUnauthenticated
 	}
 
+	if !user.IsEmailVerified {
+		return Tokens{}, core_errors.ErrEmailNotVerified
+	}
+
 	now := time.Now()
 	session, refreshToken, err := s.newSession(user.ID, now)
 	if err != nil {

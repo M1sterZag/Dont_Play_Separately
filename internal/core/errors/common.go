@@ -3,9 +3,10 @@ package core_errors
 import "errors"
 
 var (
-	ErrNotFound        = errors.New("not found")
-	ErrInvalidArgument = errors.New("invalid argument")
-	ErrConflict        = errors.New("conflict")
-	ErrUnauthenticated = errors.New("unauthenticated")
-	ErrForbidden       = errors.New("forbidden")
+	ErrNotFound          = errors.New("not found")
+	ErrInvalidArgument   = errors.New("invalid argument")
+	ErrConflict          = errors.New("conflict")
+	ErrUnauthenticated   = errors.New("unauthenticated")
+	ErrForbidden         = errors.New("forbidden")
+	ErrEmailNotVerified  = errors.New("email not verified")
 )

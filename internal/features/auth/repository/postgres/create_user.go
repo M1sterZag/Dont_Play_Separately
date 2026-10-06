@@ -25,9 +25,9 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User, favor
 
 	query := `
 	INSERT INTO dps.users
-	(id, version, email, hashed_password, nickname, bio, avatar_key, created_at)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-	RETURNING id, version, email, hashed_password, nickname, bio, avatar_key, created_at;
+	(id, version, email, hashed_password, nickname, bio, avatar_key, created_at, is_email_verified)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	RETURNING id, version, email, hashed_password, nickname, bio, avatar_key, created_at, is_email_verified;
 	`
 
 	row := tx.QueryRow(
@@ -41,6 +41,7 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User, favor
 		user.Bio,
 		user.AvatarKey,
 		user.CreatedAt,
+		user.IsEmailVerified,
 	)
 
 	var userModel auth_repository.UserModel
@@ -53,6 +54,7 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User, favor
 		&userModel.Bio,
 		&userModel.AvatarKey,
 		&userModel.CreatedAt,
+		&userModel.IsEmailVerified,
 	)
 	if err != nil {
 		if errors.Is(err, core_repository.ErrUniqueViolation) {
@@ -94,6 +96,7 @@ func (r *AuthRepository) CreateUser(ctx context.Context, user domain.User, favor
 		userModel.Bio,
 		userModel.AvatarKey,
 		userModel.CreatedAt,
+		userModel.IsEmailVerified,
 	)
 
 	return userDomain, nil

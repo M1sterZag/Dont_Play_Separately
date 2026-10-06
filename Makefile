@@ -4,7 +4,7 @@ export
 export PROJECT_ROOT=${shell pwd}
 
 docker-up:
-	@docker compose up -d postgres-service postgres-port-forwarder minio-service minio-port-forwarder redis-service redis-port-forwarder
+	@docker compose up -d postgres-service postgres-port-forwarder minio-service minio-port-forwarder redis-service redis-port-forwarder mailhog-service
 
 docker-down:
 	@docker compose down

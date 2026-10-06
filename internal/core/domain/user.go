@@ -9,14 +9,15 @@ import (
 )
 
 type User struct {
-	ID             uuid.UUID
-	Version        int
-	Email          string
-	HashedPassword string
-	Nickname       string
-	Bio            *string
-	AvatarKey      string
-	CreatedAt      time.Time
+	ID              uuid.UUID
+	Version         int
+	Email           string
+	HashedPassword  string
+	Nickname        string
+	Bio             *string
+	AvatarKey       string
+	CreatedAt       time.Time
+	IsEmailVerified bool
 }
 
 func NewUser(
@@ -27,16 +28,18 @@ func NewUser(
 	nickname string,
 	bio *string,
 	avatarKey string,
-	createdAt time.Time) User {
+	createdAt time.Time,
+	isEmailVerified bool) User {
 	return User{
-		ID:             ID,
-		Version:        version,
-		Email:          email,
-		HashedPassword: hashedPassword,
-		Nickname:       nickname,
-		Bio:            bio,
-		AvatarKey:      avatarKey,
-		CreatedAt:      createdAt,
+		ID:              ID,
+		Version:         version,
+		Email:           email,
+		HashedPassword:  hashedPassword,
+		Nickname:        nickname,
+		Bio:             bio,
+		AvatarKey:       avatarKey,
+		CreatedAt:       createdAt,
+		IsEmailVerified: isEmailVerified,
 	}
 }
 
