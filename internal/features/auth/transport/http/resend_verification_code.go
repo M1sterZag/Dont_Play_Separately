@@ -8,35 +8,36 @@ import (
 	core_http_response "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/http/response"
 )
 
-// Register creates a new user.
-// @Summary Register a new user
-// @Description Registers a new user by email, password and nickname and sends a verification code to the email. The account stays unverified until the code is confirmed via /auth/verify-email. Optionally accepts a list of up to 3 favorite platform IDs (favorite_platform_ids) that will be saved for the new user.
+// ResendVerificationCode resends the verification code to the user email.
+// @Summary Resend verification code
+// @Description Generates a new verification code and sends it to the user email. Can be requested no more often than once per configured interval.
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param request body RegisterRequest true "Registration payload"
-// @Success 201 {object} MessageResponse "Created, verification code sent"
+// @Param request body ResendVerificationCodeRequest true "Resend payload"
+// @Success 202 {object} MessageResponse "Accepted, new code sent"
 // @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
-// @Failure 409 {object} core_http_response.ErrorResponse "Conflict"
+// @Failure 404 {object} core_http_response.ErrorResponse "User not found"
+// @Failure 409 {object} core_http_response.ErrorResponse "Already verified or too frequent requests"
 // @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
-// @Router /auth/register [post]
-func (h *AuthHTTPHandler) Register(rw http.ResponseWriter, r *http.Request) {
+// @Router /auth/resend-verification-code [post]
+func (h *AuthHTTPHandler) ResendVerificationCode(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
-	var request RegisterRequest
+	var request ResendVerificationCodeRequest
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
 		responseHandler.ErrorResponse(err, "failed to decode and validate request body")
 		return
 	}
 
-	if err := h.authService.Register(ctx, request.Email, request.Password, request.Nickname, request.FavoritePlatformIDs); err != nil {
-		responseHandler.ErrorResponse(err, "failed to register")
+	if err := h.authService.ResendVerificationCode(ctx, request.Email); err != nil {
+		responseHandler.ErrorResponse(err, "failed to resend verification code")
 		return
 	}
 
 	responseHandler.JSONResponse(MessageResponse{
 		Message: "verification code sent to email",
-	}, http.StatusCreated)
+	}, http.StatusAccepted)
 }

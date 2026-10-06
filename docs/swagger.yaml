@@ -35,6 +35,11 @@ definitions:
     - email
     - password
     type: object
+  internal_features_auth_transport_http.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
   internal_features_auth_transport_http.RefreshRequest:
     properties:
       refresh_token:
@@ -66,12 +71,32 @@ definitions:
     - nickname
     - password
     type: object
+  internal_features_auth_transport_http.ResendVerificationCodeRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+    required:
+    - email
+    type: object
   internal_features_auth_transport_http.TokenResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
+    type: object
+  internal_features_auth_transport_http.VerifyEmailRequest:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      email:
+        example: user@example.com
+        type: string
+    required:
+    - code
+    - email
     type: object
   internal_features_games_transport_http.GameDTOResponse:
     properties:
@@ -483,9 +508,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registers a new user by email, password and nickname and returns
-        an access and refresh token pair. Optionally accepts a list of up to 3 favorite
-        platform IDs (favorite_platform_ids) that will be saved for the new user.
+      description: Registers a new user by email, password and nickname and sends
+        a verification code to the email. The account stays unverified until the code
+        is confirmed via /auth/verify-email. Optionally accepts a list of up to 3
+        favorite platform IDs (favorite_platform_ids) that will be saved for the new
+        user.
       parameters:
       - description: Registration payload
         in: body
@@ -497,9 +524,9 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Created, verification code sent
           schema:
-            $ref: '#/definitions/internal_features_auth_transport_http.TokenResponse'
+            $ref: '#/definitions/internal_features_auth_transport_http.MessageResponse'
         "400":
           description: Bad request
           schema:
@@ -513,6 +540,85 @@ paths:
           schema:
             $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
       summary: Register a new user
+      tags:
+      - auth
+  /auth/resend-verification-code:
+    post:
+      consumes:
+      - application/json
+      description: Generates a new verification code and sends it to the user email.
+        Can be requested no more often than once per configured interval.
+      parameters:
+      - description: Resend payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.ResendVerificationCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted, new code sent
+          schema:
+            $ref: '#/definitions/internal_features_auth_transport_http.MessageResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Already verified or too frequent requests
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Resend verification code
+      tags:
+      - auth
+  /auth/verify-email:
+    post:
+      consumes:
+      - application/json
+      description: Confirms the email using the verification code sent during registration.
+        On success the account is marked as verified and an access and refresh token
+        pair is returned.
+      parameters:
+      - description: Verification payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.VerifyEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verified, tokens returned
+          schema:
+            $ref: '#/definitions/internal_features_auth_transport_http.TokenResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Already verified
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      summary: Verify user email with a code
       tags:
       - auth
   /games/{id}:

@@ -84,6 +84,14 @@ services:
       - ${PROJECT_ROOT}:/code
       - ${GOPATH}/pkg/mod:/go/pkg/mod
 
+  mailhog-service:
+    image: mailhog/mailhog:latest
+    container_name: dps-mailhog-service
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    restart: always
+
   redis-service:
     image: redis:7-alpine
     container_name: dps-redis-service

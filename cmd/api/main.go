@@ -12,6 +12,7 @@ import (
 	core_redis_cache "github.com/M1sterZag/Dont_Play_Separately/internal/core/cache/redis"
 	core_config "github.com/M1sterZag/Dont_Play_Separately/internal/core/config"
 	core_logger "github.com/M1sterZag/Dont_Play_Separately/internal/core/logger"
+	core_mailer "github.com/M1sterZag/Dont_Play_Separately/internal/core/mailer"
 	core_igdb_provider "github.com/M1sterZag/Dont_Play_Separately/internal/core/provider/igdb"
 	core_pgx_pool "github.com/M1sterZag/Dont_Play_Separately/internal/core/repository/postgres/pool/pgx"
 	core_storage "github.com/M1sterZag/Dont_Play_Separately/internal/core/storage"
@@ -96,6 +97,10 @@ func main() {
 	ProviderConfig := core_igdb_provider.NewConfigMust()
 	ProviderClient := core_igdb_provider.NewClient(ProviderConfig)
 
+	logger.Debug("initializing mailer")
+	mailerConfig := core_mailer.NewConfigMust()
+	mailer := core_mailer.NewSMTPMailer(mailerConfig)
+
 	logger.Debug("initializing auth feature")
 	authConfig := auth_config.NewConfigMust()
 	jwtSigner := auth_service.NewJWTSigner(
@@ -112,7 +117,7 @@ func main() {
 		return uuid.Parse(claims.Subject)
 	})
 	authRepository := auth_postgres_repository.NewAuthRepository(pool)
-	authService := auth_service.NewAuthService(authRepository, jwtSigner)
+	authService := auth_service.NewAuthService(authRepository, jwtSigner, RedisClient, mailer, authConfig)
 	authTransportHTTP := auth_transport_http.NewAuthHTTPHandler(authService)
 
 	logger.Debug("initializing users feature")

@@ -16,7 +16,7 @@ func (r *AuthRepository) GetUserByEmail(ctx context.Context, email string) (doma
 	defer cancel()
 
 	query := `
-	SELECT id, version, email, hashed_password, nickname, bio, avatar_key, created_at
+	SELECT id, version, email, hashed_password, nickname, bio, avatar_key, created_at, is_email_verified
 	FROM dps.users
 	WHERE email = $1;
 	`
@@ -33,6 +33,7 @@ func (r *AuthRepository) GetUserByEmail(ctx context.Context, email string) (doma
 		&userModel.Bio,
 		&userModel.AvatarKey,
 		&userModel.CreatedAt,
+		&userModel.IsEmailVerified,
 	)
 	if err != nil {
 		if errors.Is(err, core_repository.ErrNoRows) {
@@ -51,6 +52,7 @@ func (r *AuthRepository) GetUserByEmail(ctx context.Context, email string) (doma
 		userModel.Bio,
 		userModel.AvatarKey,
 		userModel.CreatedAt,
+		userModel.IsEmailVerified,
 	)
 
 	return userDomain, nil
