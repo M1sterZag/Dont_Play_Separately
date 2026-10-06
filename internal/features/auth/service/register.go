@@ -9,8 +9,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *AuthService) Register(ctx context.Context, email, password, nickname string) (Tokens, error) {
+func (s *AuthService) Register(ctx context.Context, email, password, nickname string, favoritePlatformIDs []int) (Tokens, error) {
 	now := time.Now()
+
+	if err := domain.ValidateFavoritePlatformIDs(favoritePlatformIDs); err != nil {
+		return Tokens{}, fmt.Errorf("validate favorite platform ids: %w", err)
+	}
 
 	hashedPassword, err := HashPassword(password)
 	if err != nil {
@@ -29,7 +33,7 @@ func (s *AuthService) Register(ctx context.Context, email, password, nickname st
 		now,
 	)
 
-	if _, err := s.authRepository.CreateUser(ctx, user); err != nil {
+	if _, err := s.authRepository.CreateUser(ctx, user, favoritePlatformIDs); err != nil {
 		return Tokens{}, fmt.Errorf("create user: %w", err)
 	}
 

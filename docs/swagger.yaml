@@ -7,6 +7,15 @@ definitions:
       message:
         type: string
     type: object
+  github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-array_int:
+    properties:
+      set:
+        type: boolean
+      value:
+        items:
+          type: integer
+        type: array
+    type: object
   github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string:
     properties:
       set:
@@ -39,6 +48,11 @@ definitions:
       email:
         example: user@example.com
         type: string
+      favorite_platform_ids:
+        items:
+          type: integer
+        maxItems: 3
+        type: array
       nickname:
         example: gamemaster
         maxLength: 40
@@ -295,6 +309,19 @@ definitions:
       user_id:
         type: string
     type: object
+  internal_features_users_transport_http.FavoritePlatformDTOResponse:
+    properties:
+      abbreviation:
+        type: string
+      icon_url:
+        type: string
+      id:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
   internal_features_users_transport_http.GetProfileResponse:
     properties:
       avatar_url:
@@ -303,6 +330,10 @@ definitions:
         type: string
       created_at:
         type: string
+      favorite_platforms:
+        items:
+          $ref: '#/definitions/internal_features_users_transport_http.FavoritePlatformDTOResponse'
+        type: array
       id:
         type: string
       nickname:
@@ -316,6 +347,8 @@ definitions:
         $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
       bio:
         $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
+      favorite_platform_ids:
+        $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-array_int'
       nickname:
         $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string'
     type: object
@@ -327,6 +360,10 @@ definitions:
         type: string
       created_at:
         type: string
+      favorite_platforms:
+        items:
+          $ref: '#/definitions/internal_features_users_transport_http.FavoritePlatformDTOResponse'
+        type: array
       id:
         type: string
       nickname:
@@ -447,7 +484,8 @@ paths:
       consumes:
       - application/json
       description: Registers a new user by email, password and nickname and returns
-        an access and refresh token pair.
+        an access and refresh token pair. Optionally accepts a list of up to 3 favorite
+        platform IDs (favorite_platform_ids) that will be saved for the new user.
       parameters:
       - description: Registration payload
         in: body
@@ -1024,8 +1062,10 @@ paths:
       consumes:
       - application/json
       description: 'Partially updates the authenticated user''s public profile (nickname,
-        bio, avatar preset). A field is updated only if it is present in the body;
-        pass "bio": null to clear it. Only the owner can modify their own profile.'
+        bio, avatar preset, favorite platforms). A field is updated only if it is
+        present in the body; pass "bio": null to clear it, pass "favorite_platform_ids":
+        null to clear the list of favorite platforms (max 3 items). Only the owner
+        can modify their own profile.'
       parameters:
       - description: Profile patch payload
         in: body

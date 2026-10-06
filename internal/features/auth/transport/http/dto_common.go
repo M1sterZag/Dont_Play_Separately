@@ -1,9 +1,10 @@
 package auth_transport_http
 
 type RegisterRequest struct {
-	Email    string `json:"email" validate:"required,email" example:"user@example.com"`
-	Password string `json:"password" validate:"required,password" example:"P@ssw0rd123!"`
-	Nickname string `json:"nickname" validate:"required,min=1,max=40" example:"gamemaster"`
+	Email               string `json:"email" validate:"required,email" example:"user@example.com"`
+	Password            string `json:"password" validate:"required,password" example:"P@ssw0rd123!"`
+	Nickname            string `json:"nickname" validate:"required,min=1,max=40" example:"gamemaster"`
+	FavoritePlatformIDs []int  `json:"favorite_platform_ids" validate:"omitempty,max=3,dive,gt=0"`
 }
 
 type LoginRequest struct {

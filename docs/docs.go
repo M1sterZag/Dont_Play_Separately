@@ -170,7 +170,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Registers a new user by email, password and nickname and returns an access and refresh token pair.",
+                "description": "Registers a new user by email, password and nickname and returns an access and refresh token pair. Optionally accepts a list of up to 3 favorite platform IDs (favorite_platform_ids) that will be saved for the new user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -983,7 +983,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Partially updates the authenticated user's public profile (nickname, bio, avatar preset). A field is updated only if it is present in the body; pass \"bio\": null to clear it. Only the owner can modify their own profile.",
+                "description": "Partially updates the authenticated user's public profile (nickname, bio, avatar preset, favorite platforms). A field is updated only if it is present in the body; pass \"bio\": null to clear it, pass \"favorite_platform_ids\": null to clear the list of favorite platforms (max 3 items). Only the owner can modify their own profile.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1118,6 +1118,20 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-array_int": {
+            "type": "object",
+            "properties": {
+                "set": {
+                    "type": "boolean"
+                },
+                "value": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string": {
             "type": "object",
             "properties": {
@@ -1169,6 +1183,13 @@ const docTemplate = `{
                 "email": {
                     "type": "string",
                     "example": "user@example.com"
+                },
+                "favorite_platform_ids": {
+                    "type": "array",
+                    "maxItems": 3,
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "nickname": {
                     "type": "string",
@@ -1550,6 +1571,26 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_features_users_transport_http.FavoritePlatformDTOResponse": {
+            "type": "object",
+            "properties": {
+                "abbreviation": {
+                    "type": "string"
+                },
+                "icon_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_features_users_transport_http.GetProfileResponse": {
             "type": "object",
             "properties": {
@@ -1561,6 +1602,12 @@ const docTemplate = `{
                 },
                 "created_at": {
                     "type": "string"
+                },
+                "favorite_platforms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_features_users_transport_http.FavoritePlatformDTOResponse"
+                    }
                 },
                 "id": {
                     "type": "string"
@@ -1582,6 +1629,9 @@ const docTemplate = `{
                 "bio": {
                     "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string"
                 },
+                "favorite_platform_ids": {
+                    "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-array_int"
+                },
                 "nickname": {
                     "$ref": "#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_types.Nullable-string"
                 }
@@ -1598,6 +1648,12 @@ const docTemplate = `{
                 },
                 "created_at": {
                     "type": "string"
+                },
+                "favorite_platforms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_features_users_transport_http.FavoritePlatformDTOResponse"
+                    }
                 },
                 "id": {
                     "type": "string"

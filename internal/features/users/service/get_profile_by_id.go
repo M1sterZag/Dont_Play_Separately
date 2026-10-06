@@ -14,5 +14,11 @@ func (s *UsersService) GetProfileByID(ctx context.Context, userID uuid.UUID) (do
 		return domain.UserProfile{}, fmt.Errorf("get user profile from repository: %w", err)
 	}
 
+	favoritePlatforms, err := s.usersRepository.GetFavoritePlatforms(ctx, userID)
+	if err != nil {
+		return domain.UserProfile{}, fmt.Errorf("get favorite platforms: %w", err)
+	}
+	profile.FavoritePlatforms = favoritePlatforms
+
 	return profile, nil
 }

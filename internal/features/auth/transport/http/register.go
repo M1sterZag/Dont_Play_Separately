@@ -10,7 +10,7 @@ import (
 
 // Register creates a new user.
 // @Summary Register a new user
-// @Description Registers a new user by email, password and nickname and returns an access and refresh token pair.
+// @Description Registers a new user by email, password and nickname and returns an access and refresh token pair. Optionally accepts a list of up to 3 favorite platform IDs (favorite_platform_ids) that will be saved for the new user.
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -31,7 +31,7 @@ func (h *AuthHTTPHandler) Register(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokens, err := h.authService.Register(ctx, request.Email, request.Password, request.Nickname)
+	tokens, err := h.authService.Register(ctx, request.Email, request.Password, request.Nickname, request.FavoritePlatformIDs)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "failed to register")
 		return

@@ -9,7 +9,8 @@ import (
 
 type UsersRepository interface {
 	GetProfileByID(ctx context.Context, userID uuid.UUID) (domain.UserProfile, error)
-	PatchProfile(ctx context.Context, userID uuid.UUID, patch domain.UserProfile) (domain.UserProfile, error)
+	GetFavoritePlatforms(ctx context.Context, userID uuid.UUID) ([]domain.Platform, error)
+	PatchProfile(ctx context.Context, userID uuid.UUID, profile domain.UserProfile, favoritePlatformIDs *[]int) (domain.UserProfile, error)
 	DeleteProfile(ctx context.Context, userID uuid.UUID) error
 }
 
