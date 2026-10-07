@@ -555,7 +555,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Search by team title",
+                        "description": "Search by team title, game title or platform title/abbreviation",
                         "name": "q",
                         "in": "query"
                     },

@@ -762,7 +762,7 @@ paths:
       description: Returns active teams with optional filtering by search query, game
         and platform.
       parameters:
-      - description: Search by team title
+      - description: Search by team title, game title or platform title/abbreviation
         in: query
         name: q
         type: string
