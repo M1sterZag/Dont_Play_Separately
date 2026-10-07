@@ -356,13 +356,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size",
+                        "description": "Page size (default 20)",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page offset",
+                        "description": "Page offset (default 0)",
                         "name": "offset",
                         "in": "query"
                     }
@@ -459,13 +459,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size",
+                        "description": "Page size (default 20)",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page offset",
+                        "description": "Page offset (default 0)",
                         "name": "offset",
                         "in": "query"
                     }

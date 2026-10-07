@@ -17,8 +17,8 @@ func (r *GamesRepository) SearchGames(ctx context.Context, searchQuery string, l
 	FROM dps.games
 	WHERE title ILIKE '%' || $1 || '%'
 	ORDER BY title ASC
-	OFFSET $2
-	LIMIT $3;
+	OFFSET COALESCE($2, 0)
+	LIMIT COALESCE($3, 20);
 	`
 
 	rows, err := r.pool.Query(ctx, query, searchQuery, offset, limit)

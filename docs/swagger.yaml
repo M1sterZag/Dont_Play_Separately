@@ -661,11 +661,11 @@ paths:
         name: q
         required: true
         type: string
-      - description: Page size
+      - description: Page size (default 20)
         in: query
         name: limit
         type: integer
-      - description: Page offset
+      - description: Page offset (default 0)
         in: query
         name: offset
         type: integer
@@ -729,11 +729,11 @@ paths:
         name: q
         required: true
         type: string
-      - description: Page size
+      - description: Page size (default 20)
         in: query
         name: limit
         type: integer
-      - description: Page offset
+      - description: Page offset (default 0)
         in: query
         name: offset
         type: integer
