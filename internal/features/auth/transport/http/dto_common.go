@@ -25,6 +25,11 @@ type ResendVerificationCodeRequest struct {
 	Email string `json:"email" validate:"required,email" example:"user@example.com"`
 }
 
+type ChangePasswordRequest struct {
+	OldPassword string `json:"old_password" validate:"required" example:"P@ssw0rd123!"`
+	NewPassword string `json:"new_password" validate:"required,password" example:"N3wP@ssw0rd456!"`
+}
+
 type MessageResponse struct {
 	Message string `json:"message"`
 }

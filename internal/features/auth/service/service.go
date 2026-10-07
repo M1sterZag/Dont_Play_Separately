@@ -12,12 +12,15 @@ import (
 
 type AuthRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (domain.User, error)
+	GetUserByID(ctx context.Context, userID uuid.UUID) (domain.User, error)
 	CreateUser(ctx context.Context, user domain.User, favoritePlatformIDs []int) (domain.User, error)
 	MarkEmailVerified(ctx context.Context, userID uuid.UUID) error
+	UpdatePassword(ctx context.Context, userID uuid.UUID, hashedPassword string) error
 
 	CreateSession(ctx context.Context, session domain.RefreshSession) error
 	FindSessionByID(ctx context.Context, sessionID uuid.UUID) (domain.RefreshSession, error)
 	RevokeSession(ctx context.Context, sessionID uuid.UUID) error
+	RevokeAllUserSessions(ctx context.Context, userID uuid.UUID) error
 }
 
 type Tokens struct {
