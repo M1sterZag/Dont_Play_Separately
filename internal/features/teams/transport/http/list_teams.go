@@ -16,7 +16,7 @@ type ListTeamsResponse []TeamDTOResponse
 // @Description Returns active teams with optional filtering by search query, game and platform.
 // @Tags teams
 // @Produce json
-// @Param q query string false "Search by team title"
+// @Param q query string false "Search by team title, game title or platform title/abbreviation"
 // @Param game_id query int false "Filter by game ID"
 // @Param platform_id query int false "Filter by platform ID"
 // @Param limit query int false "Page size (default 20)"

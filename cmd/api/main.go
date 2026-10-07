@@ -165,8 +165,15 @@ func main() {
 		core_http_middleware.Panic(),
 	)
 
+	authRoutes := authTransportHTTP.Routes()
+	for i := range authRoutes {
+		if authRoutes[i].Path == "/auth/change-password" {
+			authRoutes[i].Middleware = append(authRoutes[i].Middleware, authMW)
+		}
+	}
+
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersion1)
-	apiVersionRouter.RegisterRouters(authTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRouters(authRoutes...)
 	apiVersionRouter.RegisterRouters(usersRoutes...)
 	apiVersionRouter.RegisterRouters(gamesTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRouters(platformsTransportHTTP.Routes()...)

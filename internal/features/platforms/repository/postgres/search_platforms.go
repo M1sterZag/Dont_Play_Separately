@@ -17,8 +17,8 @@ func (r *PlatformsRepository) SearchPlatforms(ctx context.Context, searchQuery s
 	FROM dps.platforms
 	WHERE title ILIKE '%' || $1 || '%'
 	ORDER BY title ASC, id ASC
-	OFFSET $2
-	LIMIT $3;
+	OFFSET COALESCE($2, 0)
+	LIMIT COALESCE($3, 20);
 	`
 
 	rows, err := r.pool.Query(ctx, query, searchQuery, offset, limit)

@@ -18,8 +18,8 @@ type SearchGamesResponse []GameDTOResponse
 // @Tags games
 // @Produce json
 // @Param q query string true "Search query"
-// @Param limit query int false "Page size"
-// @Param offset query int false "Page offset"
+// @Param limit query int false "Page size (default 20)"
+// @Param offset query int false "Page offset (default 0)"
 // @Success 200 {object} SearchGamesResponse "OK"
 // @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
 // @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"

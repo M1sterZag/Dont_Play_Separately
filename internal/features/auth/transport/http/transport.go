@@ -6,6 +6,7 @@ import (
 
 	core_http_server "github.com/M1sterZag/Dont_Play_Separately/internal/core/transport/server"
 	auth_service "github.com/M1sterZag/Dont_Play_Separately/internal/features/auth/service"
+	"github.com/google/uuid"
 )
 
 type AuthService interface {
@@ -16,6 +17,7 @@ type AuthService interface {
 	Login(ctx context.Context, email, password string) (auth_service.Tokens, error)
 	Refresh(ctx context.Context, refreshToken string) (auth_service.Tokens, error)
 	Logout(ctx context.Context, refreshToken string) error
+	ChangePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error
 }
 
 type AuthHTTPHandler struct {
@@ -50,7 +52,12 @@ func (h *AuthHTTPHandler) Routes() []core_http_server.Route {
 			Path:    "/auth/refresh",
 			Handler: h.Refresh,
 		},
-				{
+		{
+			Method:  http.MethodPatch,
+			Path:    "/auth/change-password",
+			Handler: h.ChangePassword,
+		},
+		{
 			Method:  http.MethodPost,
 			Path:    "/auth/verify-email",
 			Handler: h.VerifyEmail,

@@ -23,6 +23,18 @@ definitions:
       value:
         type: string
     type: object
+  internal_features_auth_transport_http.ChangePasswordRequest:
+    properties:
+      new_password:
+        example: N3wP@ssw0rd456!
+        type: string
+      old_password:
+        example: P@ssw0rd123!
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
   internal_features_auth_transport_http.LoginRequest:
     properties:
       email:
@@ -403,6 +415,46 @@ info:
   title: DPS Backend API
   version: "1.0"
 paths:
+  /auth/change-password:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the authenticated user's password after verifying the current
+        one. All active refresh sessions are revoked, so the user must log in again
+        on all devices.
+      parameters:
+      - description: Old and new passwords
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_auth_transport_http.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "403":
+          description: Forbidden (wrong current password)
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_M1sterZag_Dont_Play_Separately_internal_core_transport_http_response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Change password
+      tags:
+      - auth
   /auth/login:
     post:
       consumes:
@@ -661,11 +713,11 @@ paths:
         name: q
         required: true
         type: string
-      - description: Page size
+      - description: Page size (default 20)
         in: query
         name: limit
         type: integer
-      - description: Page offset
+      - description: Page offset (default 0)
         in: query
         name: offset
         type: integer
@@ -729,11 +781,11 @@ paths:
         name: q
         required: true
         type: string
-      - description: Page size
+      - description: Page size (default 20)
         in: query
         name: limit
         type: integer
-      - description: Page offset
+      - description: Page offset (default 0)
         in: query
         name: offset
         type: integer
@@ -762,7 +814,7 @@ paths:
       description: Returns active teams with optional filtering by search query, game
         and platform.
       parameters:
-      - description: Search by team title
+      - description: Search by team title, game title or platform title/abbreviation
         in: query
         name: q
         type: string
