@@ -61,7 +61,7 @@ func (m *TokenManager) fetchToken(ctx context.Context) (string, int, error) {
 	if err != nil {
 		return "", 0, fmt.Errorf("request token: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(response.Body)

@@ -68,7 +68,7 @@ func (c *Client) do(ctx context.Context, endpoint, body string) ([]byte, error) 
 
 		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
 			respBody, _ := io.ReadAll(resp.Body)
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			lastErr = fmt.Errorf("igdb status %d: %s", resp.StatusCode, string(respBody))
 
 			backoff := time.Duration(1<<attempt) * time.Second // 1s, 2s, 4s
@@ -80,7 +80,7 @@ func (c *Client) do(ctx context.Context, endpoint, body string) ([]byte, error) 
 			}
 		}
 		respBody, err := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		if err != nil {
 			return nil, fmt.Errorf("read igdb response: %w", err)
 		}
