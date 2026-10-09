@@ -60,7 +60,7 @@ services:
       retries: 12
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     restart: unless-stopped
     command: server /data --address ":9000" --console-address ":9001"
     environment:
@@ -78,7 +78,7 @@ services:
       retries: 12
 
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     restart: "no"
     depends_on:
       minio:
