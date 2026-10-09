@@ -1,0 +1,145 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-push:
+    name: Build & Push image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compute image name
+        id: image
+        run: echo "name=${REGISTRY}/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to server
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Upload deploy files
+        run: |
+          rsync -az --delete \
+            docker-compose.prod.yaml migrations assets \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/dps/
+
+      - name: Write .env and deploy
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/dps && cat > /opt/dps/.env" <<'EOF'
+          TIME_ZONE=${{ secrets.TIME_ZONE || 'UTC' }}
+          LOGGER_LEVEL=${{ secrets.LOGGER_LEVEL || 'INFO' }}
+
+          HTTP_ADDR=:5050
+          HTTP_SHUTDOWN_TIMEOUT=30s
+          HTTP_ALLOWED_ORIGINS=${{ secrets.HTTP_ALLOWED_ORIGINS || '*' }}
+
+          POSTGRES_USER=${{ secrets.POSTGRES_USER || 'dps' }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB || 'dps' }}
+          POSTGRES_PORT=5432
+          POSTGRES_TIMEOUT=10s
+
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_TTL=1h
+          JWT_REFRESH_TTL=168h
+          JWT_VERIFICATION_CODE_TTL=10m
+          JWT_VERIFICATION_CODE_LENGTH=6
+          JWT_MAX_VERIFICATION_ATTEMPTS=5
+          JWT_MIN_RESEND_INTERVAL=60s
+
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT || '587' }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM=${{ secrets.SMTP_FROM || 'no-reply@dps.local' }}
+
+          S3_ENDPOINT=minio:9000
+          S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+          S3_BUCKET=${{ secrets.S3_BUCKET || 'avatars' }}
+          S3_PUBLIC_BASE_URL=${{ secrets.S3_PUBLIC_BASE_URL }}
+          S3_USE_SSL=false
+          S3_REGION=us-east-1
+
+          MINIO_PORT=9000
+
+          REDIS_HOST=redis
+          REDIS_PORT=6379
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_DB=0
+          REDIS_TIMEOUT=5s
+
+          IGDB_CLIENT_ID=${{ secrets.IGDB_CLIENT_ID }}
+          IGDB_CLIENT_SECRET=${{ secrets.IGDB_CLIENT_SECRET }}
+          IGDB_BASE_URL=https://api.igdb.com/v4
+          IGDB_TIMEOUT=10s
+
+          GAMES_CACHE_TTL=1h
+          PLATFORMS_CACHE_TTL=1h
+
+          APP_PORT=${{ secrets.APP_PORT || '8080' }}
+          APP_IMAGE=${{ needs.build-push.outputs.image }}
+          EOF
+
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /opt/dps &&
+            docker compose -f docker-compose.prod.yaml pull app &&
+            docker compose -f docker-compose.prod.yaml up -d --remove-orphans &&
+            docker image prune -f
+          "
