@@ -27,7 +27,7 @@ services:
     restart: always
 
   minio-service:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     container_name: dps-minio-service
     environment:
       - MINIO_ROOT_USER=${S3_ACCESS_KEY}
@@ -50,7 +50,7 @@ services:
     restart: always
 
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     container_name: dps-minio-init
     depends_on:
       - minio-service
