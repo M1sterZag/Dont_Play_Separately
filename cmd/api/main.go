@@ -91,7 +91,11 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed to init redis cache", zap.Error(err))
 	}
-	defer RedisClient.Close()
+	defer func() {
+		if err := RedisClient.Close(); err != nil {
+			logger.Error("failed to close redis cache", zap.Error(err))
+		}
+	}()
 
 	logger.Debug("initializing provider")
 	ProviderConfig := core_igdb_provider.NewConfigMust()
